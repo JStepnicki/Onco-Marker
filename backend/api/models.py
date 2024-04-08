@@ -1,4 +1,5 @@
 from django.db import models
+import json
 
 class Test(models.Model):
     title = models.CharField(max_length=255)
@@ -28,6 +29,11 @@ class Patient(models.Model):
     age = models.IntegerField()
     sex = models.BooleanField()
     cancer_samples = models.ManyToManyField(Cancer_Sample)
+
+class Doctor(models.Model):
+    name = models.CharField(max_length=255)
+    surname = models.CharField(max_length=255)
+
 
 
 
