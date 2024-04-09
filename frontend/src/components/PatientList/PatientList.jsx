@@ -1,33 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Table, TableHead, TableBody, TableRow, TableCell, Paper } from '@mui/material';
 import mockPatients from '../../mockData';
+import './PatientList.css';
 
 function PatientList() {
   return (
-    <div>
-      <h2>Lista pacjentów</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Imię</th>
-            <th>Nazwisko</th>
-            <th>Wiek</th>
-            <th>Płeć</th>
-          </tr>
-        </thead>
-        <tbody>
+    <Paper className="paper-container">
+      <Table className="table-container">
+        <TableHead>
+          <TableRow>
+            <TableCell className="table-head-cell">ID</TableCell>
+            <TableCell className="table-head-cell">Imię</TableCell>
+            <TableCell className="table-head-cell">Nazwisko</TableCell>
+            <TableCell className="table-head-cell">Wiek</TableCell>
+            <TableCell className="table-head-cell">Płeć</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {mockPatients.map(patient => (
-            <tr key={patient.id}>
-              <td>{patient.id}</td>
-              <td>{patient.name}</td>
-              <td>{patient.surname}</td>
-              <td>{patient.age}</td>
-              <td>{patient.sex ? 'Mężczyzna' : 'Kobieta'}</td>
-            </tr>
+            <TableRow key={patient.id} className="table-row">
+              <TableCell className="table-cell">{patient.id}</TableCell>
+              <TableCell className="table-cell">{patient.name}</TableCell>
+              <TableCell className="table-cell">{patient.surname}</TableCell>
+              <TableCell className="table-cell">{patient.age}</TableCell>
+              <TableCell className="table-cell">{patient.sex ? 'Mężczyzna' : 'Kobieta'}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </Paper>
   );
 }
 
