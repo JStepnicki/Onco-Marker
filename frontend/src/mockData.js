@@ -213,7 +213,7 @@ const mockPatients = [
 //   console.log(mockPatients);  - printuje wszystko na raz
 // przykładowy kod, żeby przejsc po wszytkich pacjentach i ich próbkach i wypisać ich wartości
 
-for (let patient of mockPatients) {
+/*for (let patient of mockPatients) {
     for (let key in patient) {
       if (patient.hasOwnProperty(key)) {
         console.log(key + ": " + patient[key]);
@@ -228,5 +228,5 @@ for (let patient of mockPatients) {
         }
       }
     }
-  }
-    
+  }*/
+export default mockPatients
