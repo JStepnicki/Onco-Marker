@@ -1,33 +1,24 @@
-import { useState, useEffect } from 'react'
-
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import MainPage from './pages/MainPage';
+import DoctorPage from './pages/DoctorPage';
+import Navbar from './components/Header/Navbar';
+import Register from './components/Auth/Register';
+import './App.css';
 
 function App() {
-  const [data, setData] = useState([])
-  useEffect(() => {
-    async function fetchData() {
-      console.log(import.meta.env.VITE_API_URL)
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}tests/`, { mode: 'cors' })
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-        const data = await response.json()
-        console.log(data)
-        setData(data)
-      } catch (error) {
-        console.error('There was a problem with your fetch operation:', error)
-      }
-    }
-    fetchData()
-    
-  }, [])
-
-
   return (
-    <>
-      Hello World
-    </>
-  )
+    <div>
+      <Router>
+        <Navbar/>
+        <Routes>
+          <Route path="/" element={<MainPage/>}/>
+          <Route path="/doctors" element={<DoctorPage/>}/>
+          <Route path='/register' element={<Register/>}/>
+        </Routes>
+      </Router>
+    </div>
+  );
 }
 
-export default App
+export default App;
