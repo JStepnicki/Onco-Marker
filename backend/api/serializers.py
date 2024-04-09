@@ -1,11 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 
-from models import Doctor, Patient, Cancer_Sample, Test
+from api.models import Doctor, Patient, CancerSample
 
-class TestSerializer(ModelSerializer):
-    class Meta:
-        model = Test
-        fields = ('id', 'title', 'body')
 class DoctorSerializer(ModelSerializer):
     class Meta:
         model = Doctor
@@ -20,5 +16,5 @@ class PatientSerializer(ModelSerializer):
 
 class CancerSampleSerializer(ModelSerializer):
     class Meta:
-        model = Cancer_Sample
+        model = CancerSample
         fields = ('id', 'organ_type', 'patient_cohort', 'sample_origin', 'markers_JSON')

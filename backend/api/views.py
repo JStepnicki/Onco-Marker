@@ -1,13 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from models import Test, Doctor, Patient, Cancer_Sample
-from serializers import TestSerializer, DoctorSerializer, PatientSerializer, CancerSampleSerializer
-from rest_framework.decorators import api_view
-
-class TestViewSet(ModelViewSet):
-    queryset = Test.objects.all()
-    serializer_class = TestSerializer
+from api.models import Doctor, Patient, CancerSample
+from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSerializer
 
 
 class DoctorViewSet(ModelViewSet):
@@ -21,7 +16,7 @@ class PatientViewSet(ModelViewSet):
 
 
 class CancerSampleViewSet(ModelViewSet):
-    queryset = Cancer_Sample.objects.all()
+    queryset = CancerSample.objects.all()
     serializer_class = CancerSampleSerializer
 
 def patient_list(request):
@@ -59,7 +54,7 @@ def update_patient(request, pk):
 
 def cancer_sample_list(request):
     if request.method == 'GET':
-        cancer_samples = Cancer_Sample.objects.all()
+        cancer_samples = CancerSample.objects.all()
         serializer = CancerSampleSerializer(cancer_samples, many=True)
         return Response(serializer.data)
 
