@@ -55,6 +55,7 @@ def cancer_sample_list(request):
         serializer = CancerSampleSerializer(cancer_samples, many=True)
         return Response(serializer.data)
 
+# this methods can return ERROR 
 
 @api_view(['POST'])
 def get_patient_cancer_samples(request, pk):

@@ -1,9 +1,28 @@
-import React from 'react';
-import {Table, TableHead, TableBody, TableRow, TableCell, Paper, Button} from '@mui/material';
-import mockPatients from '../../mockData';
-import './PatientList.css';
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Paper,
+  Button,
+} from "@mui/material";
+import mockPatients from "../../mockData";
+import "./PatientList.css";
 
 function PatientList() {
+  const [patients, setPatients] = useState([]);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}patients/`);
+      const data = await response.json();
+      setPatients(data);
+    };
+
+    fetchPatients();
+  }, []);
 
   return (
     <Paper className="paper-container">
@@ -19,15 +38,21 @@ function PatientList() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {mockPatients.map(patient => (
+          {mockPatients.map((patient) => (
             <TableRow key={patient.id} className="table-row">
               <TableCell className="table-cell">{patient.id}</TableCell>
               <TableCell className="table-cell">{patient.name}</TableCell>
               <TableCell className="table-cell">{patient.surname}</TableCell>
               <TableCell className="table-cell">{patient.age}</TableCell>
-              <TableCell className="table-cell">{patient.sex ? 'Mężczyzna' : 'Kobieta'}</TableCell>
               <TableCell className="table-cell">
-                <Button variant="contained" color="primary" onClick={() => handleSelect(patient.id)}>
+                {patient.sex ? "Mężczyzna" : "Kobieta"}
+              </TableCell>
+              <TableCell className="table-cell">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleSelect(patient.id)}
+                >
                   Wybierz
                 </Button>
               </TableCell>

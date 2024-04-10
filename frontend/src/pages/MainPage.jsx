@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Typography, Link } from '@mui/material';
 import Login from '../components/Auth/Login';
@@ -6,6 +6,7 @@ import './MainPage.css';
 
 function MainPage() {
   const navigate = useNavigate();
+
 
   const handleRegister = (event) => {
     event.preventDefault();
