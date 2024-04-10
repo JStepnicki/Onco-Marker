@@ -1,0 +1,22 @@
+.paper-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-container {
+  min-width: 650px;
+}
+
+.table-row:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.table-cell {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid rgba(224, 224, 224, 1);
+}
+
+.table-head-cell {
+  font-weight: bold;
+}
