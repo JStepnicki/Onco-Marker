@@ -1,9 +1,10 @@
 import React from 'react';
-import { Table, TableHead, TableBody, TableRow, TableCell, Paper } from '@mui/material';
+import {Table, TableHead, TableBody, TableRow, TableCell, Paper, Button} from '@mui/material';
 import mockPatients from '../../mockData';
 import './PatientList.css';
 
 function PatientList() {
+
   return (
     <Paper className="paper-container">
       <Table className="table-container">
@@ -14,6 +15,7 @@ function PatientList() {
             <TableCell className="table-head-cell">Nazwisko</TableCell>
             <TableCell className="table-head-cell">Wiek</TableCell>
             <TableCell className="table-head-cell">Płeć</TableCell>
+            <TableCell className="table-head-cell"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -24,6 +26,11 @@ function PatientList() {
               <TableCell className="table-cell">{patient.surname}</TableCell>
               <TableCell className="table-cell">{patient.age}</TableCell>
               <TableCell className="table-cell">{patient.sex ? 'Mężczyzna' : 'Kobieta'}</TableCell>
+              <TableCell className="table-cell">
+                <Button variant="contained" color="primary" onClick={() => handleSelect(patient.id)}>
+                  Wybierz
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
