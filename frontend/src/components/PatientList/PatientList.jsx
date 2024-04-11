@@ -20,8 +20,8 @@ function PatientList() {
   });
 
   const StyledGridItem = styled(Grid)(({ theme }) => ({
-    height: '200px', 
-    width: '200px', 
+    height: '200px',
+    width: '200px',
   }));
 
   useEffect(() => {
@@ -37,7 +37,7 @@ function PatientList() {
   }, []);
 
   useEffect(() => {
-    const filteredPatients = patients.filter(patient => 
+    const filteredPatients = patients.filter(patient =>
       patient.name.toLowerCase().includes(search.toLowerCase())
     );
     setDisplayedPatients(filteredPatients.slice((page - 1) * 16, page * 16));
@@ -68,7 +68,7 @@ function PatientList() {
                   {patient.name}
                 </TableCell>
                 <TableCell align="right">{patient.age}</TableCell>
-                <TableCell align="right">{patient.gender}</TableCell>
+                <TableCell align="right">{patient.sex ? 'Man' : 'Female'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
