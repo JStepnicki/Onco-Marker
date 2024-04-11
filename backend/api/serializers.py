@@ -11,10 +11,11 @@ class DoctorSerializer(ModelSerializer):
 class PatientSerializer(ModelSerializer):
     class Meta:
         model = Patient
-        fields = ('id', 'name', 'surname', 'age', 'sex', 'cancer_samples')
+        fields = ('id', 'name', 'surname', 'age', 'sex')
 
 
 class CancerSampleSerializer(ModelSerializer):
     class Meta:
         model = CancerSample
-        fields = ('id', 'organ_type', 'patient_cohort', 'sample_origin', 'markers_JSON')
+        fields = ('id', 'patient', 'organ_type', 'patient_cohort', 'sample_origin', 'markers_JSON')
+
