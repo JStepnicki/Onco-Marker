@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Grid, Typography, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
+import { Box, Typography, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button } from "@mui/material";
 import { styled } from "@mui/system";
 import Filter from "../Header/Filter";
 
@@ -18,11 +18,6 @@ function PatientList() {
     flexGrow: 1,
     margin: '16px',
   });
-
-  const StyledGridItem = styled(Grid)(({ theme }) => ({
-    height: '200px',
-    width: '200px',
-  }));
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -43,6 +38,11 @@ function PatientList() {
     setDisplayedPatients(filteredPatients.slice((page - 1) * 16, page * 16));
   }, [patients, page, search]);
 
+  const handleExamineSamples = (patientId) => {
+
+    console.log(`Examine samples for patient with ID: ${patientId}`);
+  };
+
   return (
     <StyledBox>
       <Filter
@@ -59,6 +59,7 @@ function PatientList() {
               <TableCell>Name</TableCell>
               <TableCell align="right">Age</TableCell>
               <TableCell align="right">Gender</TableCell>
+              <TableCell align="right">Actions</TableCell> {/* Nowa kolumna dla guzika */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -68,7 +69,12 @@ function PatientList() {
                   {patient.name}
                 </TableCell>
                 <TableCell align="right">{patient.age}</TableCell>
-                <TableCell align="right">{patient.sex ? 'Man' : 'Female'}</TableCell>
+                <TableCell align="right">{patient.gender ? 'Male' : 'Female'}</TableCell>
+                <TableCell align="right">
+                  <Button variant="outlined" onClick={() => handleExamineSamples(patient.id)}>
+                    Examine samples
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
