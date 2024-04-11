@@ -58,7 +58,7 @@ function PatientList() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
+              <TableCell>Name and Surname</TableCell>
               <TableCell align="right">Age</TableCell>
               <TableCell align="right">Gender</TableCell>
               <TableCell align="right">Actions</TableCell> {/* Nowa kolumna dla guzika */}

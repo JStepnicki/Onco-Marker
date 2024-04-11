@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Typography, Card, CardContent } from "@mui/material";
+import { Typography, Card, CardContent, Grid, Paper, Box } from "@mui/material";
 import { styled } from "@mui/system";
 
 const Container = styled("div")({
@@ -37,15 +37,19 @@ function PatientPage() {
 
   return (
     <Container>
-      <Typography variant="h4">Patient ID: {patient.id}</Typography>
-      <Typography variant="body1">Patient Name: {patient.name}</Typography>
-      <Typography variant="body1">
-        Patient Surname: {patient.surname}
-      </Typography>
-      <Typography variant="body1">Patient Age: {patient.age}</Typography>
-      <Typography variant="body1">
-        Gender: {patient.sex == true ? "Male" : "Female"}
-      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Paper elevation={3}>
+            <Box textAlign="center">
+              <Typography variant="h6">{patient.name} {patient.surname}</Typography>
+              <Typography variant="body1">Age: {patient.age}</Typography>
+              <Typography variant="body1">
+                Gender: {patient.sex == true ? "Male" : "Female"}
+              </Typography>
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
 
       {samplesData.map((sample) => (
         <Sample key={sample.id}>
