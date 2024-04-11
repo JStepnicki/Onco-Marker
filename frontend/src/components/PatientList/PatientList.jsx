@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Box, Typography, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button } from "@mui/material";
 import { styled } from "@mui/system";
 import Filter from "../Header/Filter";
+import { useNavigate } from 'react-router-dom';
 
 
 function PatientList() {
@@ -9,6 +10,7 @@ function PatientList() {
   const [displayedPatients, setDisplayedPatients] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
 
   const memoizedSetSearch = useCallback((newSearch) => {
     setSearch(newSearch);
@@ -39,8 +41,8 @@ function PatientList() {
   }, [patients, page, search]);
 
   const handleExamineSamples = (patientId) => {
-
-    console.log(`Examine samples for patient with ID: ${patientId}`);
+    const patient = patients.find(patient => patient.id === patientId);
+    navigate(`/patients/${patientId}`, { state: { patient } });
   };
 
   return (
@@ -66,10 +68,10 @@ function PatientList() {
             {displayedPatients.map((patient) => (
               <TableRow key={patient.id}>
                 <TableCell component="th" scope="row">
-                  {patient.name}
+                  {patient.name} {patient.surname}
                 </TableCell>
                 <TableCell align="right">{patient.age}</TableCell>
-                <TableCell align="right">{patient.gender ? 'Male' : 'Female'}</TableCell>
+                <TableCell align="right">{patient.sex == true ? 'Male' : 'Female'}</TableCell>
                 <TableCell align="right">
                   <Button variant="outlined" onClick={() => handleExamineSamples(patient.id)}>
                     Examine samples
