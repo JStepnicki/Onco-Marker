@@ -12,6 +12,6 @@ urlpatterns = [
     path('patients/<int:pk>/delete/', delete_patient, name='delete-patient'),
     path('patients/<int:pk>/update/', update_patient, name='update-patient'),
     path('cancer_samples/', cancer_sample_list, name='cancer-sample-list'),
-    path('patients/<int:pk>/cancer_samples/', get_patient_cancer_samples, name='get-patient-cancer-samples'),
-    path('patients/<int:pk>/cancer_samples/add/', add_patient_cancer_sample, name='add-patient-cancer-sample'),
+    path('patients/cancer_samples/<int:pk>/', get_patient_cancer_samples, name='get-patient-cancer-samples'),
+    path('patients/cancer_samples/add/<int:pk>/', add_patient_cancer_sample, name='add-patient-cancer-sample'),
 ]

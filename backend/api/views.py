@@ -63,7 +63,8 @@ def get_patient_cancer_samples(request, pk):
             patient = Patient.objects.get(pk=pk)
         except Patient.DoesNotExist:
             return Response(status=404)
-        serializer = CancerSampleSerializer(patient.cancer_samples.all(), many=True)
+        serializer = CancerSampleSerializer(patient.cancersample_set.all(), many=True)
+        print(serializer.data)
         return Response(serializer.data)
 
 
@@ -74,7 +75,7 @@ def add_patient_cancer_sample(request, pk):
             patient = Patient.objects.get(pk=pk)
         except Patient.DoesNotExist:
             return Response(status=404)
-        serializer = CancerSampleSerializer(data=request.data)
+        serializer = CancerSampleSerializer(patient.cancersample_set.all(), many=True)
         if serializer.is_valid():
             serializer.save(patient=patient)
             return Response(serializer.data, status=201)
