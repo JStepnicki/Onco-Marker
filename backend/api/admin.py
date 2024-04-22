@@ -1,4 +1,11 @@
 from django.contrib import admin
-from .models import Test
 
-admin.site.register(Test)
+
+register = admin.site.register
+# Register your models here.
+
+from .models import Patient, CancerSample, Doctor
+
+register(Patient)
+register(CancerSample)
+register(Doctor)
