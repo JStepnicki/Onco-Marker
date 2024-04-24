@@ -1,25 +1,35 @@
 import React, { useState } from 'react';
-import { Button, TextField, Box } from '@mui/material';
+import { Button, TextField, Box, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import app from '../../../firebase';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; // Correct the import
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const auth = getAuth(app); // Get auth from Firebase app
+  const auth = getAuth(app);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      await signInWithEmailAndPassword(auth, email, password); // Use signInWithEmailAndPassword from auth
+      await signInWithEmailAndPassword(auth, email, password);
       navigate('/doctors');
     } catch (error) {
       console.error('Error signing in:', error);
       // Handle login errors
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert('Password reset email sent. Check your inbox!');
+    } catch (error) {
+      console.error('Error sending reset email:', error);
+      alert('Failed to send reset email. Check your email address.');
     }
   };
 
@@ -45,6 +55,11 @@ function Login() {
       <Button variant="contained" color="primary" type="submit" fullWidth>
         Login
       </Button>
+      <Box mt={2}>
+        <Link onClick={handleForgotPassword} style={{ cursor: 'pointer' }}>
+          Forgot Password?
+        </Link>
+      </Box>
     </Box>
   );
 }
