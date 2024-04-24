@@ -34,18 +34,17 @@ def delete_patient(request, pk):
         return Response(status=204)
 
 
-@api_view(['UPDATE'])
+@api_view(['PUT'])
 def update_patient(request, pk):
-    if request.method == 'UPDATE':
-        try:
-            patient = Patient.objects.get(pk=pk)
-        except Patient.DoesNotExist:
-            return Response(status=404)
-        serializer = PatientSerializer(patient, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+    try:
+        patient = Patient.objects.get(pk=pk)
+    except Patient.DoesNotExist:
+        return Response(status=404)
+    serializer = PatientSerializer(patient, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=400)
 
 
 @api_view(['GET'])
