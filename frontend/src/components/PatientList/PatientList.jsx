@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
-  Typography,
   TableContainer,
   Paper,
   Table,
@@ -17,6 +16,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import EditDialog from "./EditDialog";
 
+const StyledBox = styled(Box)({
+  flexGrow: 1,
+  margin: "16px",
+});
+
 function PatientList() {
   const [patients, setPatients] = useState([]);
   const [displayedPatients, setDisplayedPatients] = useState([]);
@@ -31,11 +35,6 @@ function PatientList() {
     setSearch(newSearch);
   }, []);
 
-  const StyledBox = styled(Box)({
-    flexGrow: 1,
-    margin: "16px",
-  });
-
   useEffect(() => {
     const fetchPatients = async () => {
       const response = await fetch(`${import.meta.env.VITE_API_URL}patients/`);
@@ -48,7 +47,7 @@ function PatientList() {
 
   useEffect(() => {
     const filteredPatients = patients.filter((patient) =>
-      patient.name.toLowerCase().includes(search.toLowerCase())
+      (patient.name + ' ' + patient.surname).toLowerCase().includes(search.toLowerCase())
     );
     setDisplayedPatients(filteredPatients.slice((page - 1) * 16, page * 16));
   }, [patients, page, search]);
@@ -60,7 +59,7 @@ function PatientList() {
 
   const addPatient = async (patientData) => {
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}patients/`,
+      `${import.meta.env.VITE_API_URL}patients/add/`,
       patientData
     );
     setPatients([...patients, response.data]);
@@ -108,6 +107,7 @@ function PatientList() {
         page={page}
         setPage={setPage}
         totalItems={patients.length}
+        addPatient={addPatient}
       />
       <TableContainer component={Paper}>
         <Table>
