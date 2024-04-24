@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, TextField, Box, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import app from './firebase';
 
 function Login() {
   const navigate = useNavigate();
