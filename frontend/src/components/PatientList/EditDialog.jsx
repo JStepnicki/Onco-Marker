@@ -1,4 +1,3 @@
-// EditDialog.jsx
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { useState, useEffect } from "react";
 
@@ -28,6 +27,7 @@ function EditDialog({ open, handleClose, patient, updatePatient }) {
           value={editForm?.name}
           onChange={handleInputChange}
           fullWidth
+          margin="normal"
         />
         <TextField
           name="surname"
@@ -35,6 +35,7 @@ function EditDialog({ open, handleClose, patient, updatePatient }) {
           value={editForm?.surname}
           onChange={handleInputChange}
           fullWidth
+          margin="normal"
         />
         <TextField
           name="age"
@@ -43,8 +44,9 @@ function EditDialog({ open, handleClose, patient, updatePatient }) {
           value={editForm?.age}
           onChange={handleInputChange}
           fullWidth
+          margin="normal"
         />
-        <FormControl fullWidth>
+        <FormControl fullWidth margin="normal">
           <InputLabel id="sex-label">Sex</InputLabel>
           <Select
             labelId="sex-label"
@@ -52,8 +54,8 @@ function EditDialog({ open, handleClose, patient, updatePatient }) {
             value={editForm?.sex}
             onChange={handleInputChange}
           >
-            <MenuItem value={true}>True</MenuItem>
-            <MenuItem value={false}>False</MenuItem>
+            <MenuItem value={true}>Male</MenuItem>
+            <MenuItem value={false}>Female</MenuItem>
           </Select>
         </FormControl>
       </DialogContent>

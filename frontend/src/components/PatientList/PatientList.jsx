@@ -72,15 +72,23 @@ function PatientList() {
   };
 
   const updatePatient = async (patientId, updatedData) => {
-    const response = await axios.put(
-      `${import.meta.env.VITE_API_URL}patients/${patientId}/update/`,
-      updatedData
-    );
-    setPatients(
-      patients.map((patient) =>
-        patient.id === patientId ? response.data : patient
-      )
-    );
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}patients/${patientId}/update/`,
+        updatedData
+      );
+      if (response.status === 200) {
+        setPatients(
+          patients.map((patient) =>
+            patient.id === patientId ? response.data : patient
+          )
+        );
+      } else {
+        console.error(`Failed to update patient: ${response.status}`);
+      }
+    } catch (error) {
+      console.error(`Failed to update patient: ${error}`);
+    }
   };
 
   const handleClose = () => {
