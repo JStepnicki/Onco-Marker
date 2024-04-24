@@ -10,16 +10,12 @@ import {
   TableCell,
   TableBody,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import Filter from "../Header/Filter";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import EditDialog from "./EditDialog";
 
 function PatientList() {
   const [patients, setPatients] = useState([]);
@@ -77,7 +73,7 @@ function PatientList() {
 
   const updatePatient = async (patientId, updatedData) => {
     const response = await axios.put(
-      `${import.meta.env.VITE_API_URL}patients/${patientId}/`,
+      `${import.meta.env.VITE_API_URL}patients/${patientId}/update/`,
       updatedData
     );
     setPatients(
@@ -94,15 +90,6 @@ function PatientList() {
   const handleOpen = (patient) => {
     setEditPatient(patient);
     setOpen(true);
-  };
-
-  const handleUpdate = () => {
-    // updatePatient(editPatient.id, editPatient);
-    handleClose();
-  };
-
-  const handleInputChange = (e) => {
-    setEditPatient({ ...editPatient, [e.target.name]: e.target.value });
   };
 
   return (
@@ -127,7 +114,7 @@ function PatientList() {
           <TableBody>
             {displayedPatients.map((patient) => (
               <TableRow key={patient.id}>
-                <TableCell>{patient.name}</TableCell>
+                <TableCell>{patient.name} {patient.surname}</TableCell>
                 <TableCell align="right">{patient.age}</TableCell>
                 <TableCell align="right">{patient.sex == true ? 'Male' : 'Female'}</TableCell>
                 <TableCell align="right">
@@ -144,21 +131,12 @@ function PatientList() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Edit Patient</DialogTitle>
-        <DialogContent>
-          <TextField
-            name="name"
-            label="Name"
-            value={editPatient?.name}
-            onChange={handleInputChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleUpdate}>Update</Button>
-        </DialogActions>
-      </Dialog>
+      <EditDialog
+        open={open}
+        handleClose={handleClose}
+        patient={editPatient}
+        updatePatient={updatePatient}
+      />
     </StyledBox>
   );
 }
