@@ -6,8 +6,8 @@ from rest_framework.viewsets import ModelViewSet
 
 from api.models import Doctor, Patient, CancerSample
 from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSerializer
-
 from backend.ml.pancreatic_cancer_model import classify_sample
+
 
 
 @api_view(['GET'])

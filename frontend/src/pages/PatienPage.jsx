@@ -35,13 +35,44 @@ function PatientPage() {
     fetchPatientData();
   }, []);
 
+  const handleKnnClick = async () => {
+    const new_sample_data = {
+      age: 45,
+      sex: "Male",
+      stage: "Stage II",
+      benign_sample_diagnosis: "Benign",
+      plasma_CA19_9: 37.0,
+      creatinine: 0.9,
+      LYVE1: 1.2,
+      REG1B: 0.8,
+      TFF1: 1.1,
+      REG1A: 0.7,
+    };
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}classify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(new_sample_data),
+    });
+
+    const data = await response.json();
+    console.log(data);
+  };
+
   return (
     <Container>
+      <Button variant="contained" color="primary" onClick={handleKnnClick}>
+        Run KNN Classification
+      </Button>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper elevation={3}>
             <Box textAlign="center">
-              <Typography variant="h6">{patient.name} {patient.surname}</Typography>
+              <Typography variant="h6">
+                {patient.name} {patient.surname}
+              </Typography>
               <Typography variant="body1">Age: {patient.age}</Typography>
               <Typography variant="body1">
                 Gender: {patient.sex == true ? "Male" : "Female"}
