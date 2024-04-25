@@ -18,24 +18,45 @@ df_pancreatic['benign_sample_diagnosis'] = label_encoder.fit_transform(df_pancre
 df_pancreatic['sex'] = label_encoder.fit_transform(df_pancreatic['sex'])
 df_pancreatic['stage'] = label_encoder.fit_transform(df_pancreatic['stage'])
 
+new_sample = df_pancreatic.iloc[572].to_frame().T
+new_sample_x = new_sample.drop(columns=["diagnosis"])
+new_sample_y = new_sample["diagnosis"]
+
 pancreatic_x = df_pancreatic.drop(columns=["diagnosis"])
 pancreatic_y = df_pancreatic["diagnosis"]
 
-pancreatic_train_x, pancreatic_test_x, pancreatic_train_y, pancreatic_test_y = train_test_split(pancreatic_x,
-                                                                                                pancreatic_y,
-                                                                                                test_size=0.3,
-                                                                                                random_state=1,
-                                                                                                )
-
 scaler = StandardScaler()
-pancreatic_train_x = scaler.fit_transform(pancreatic_train_x)
-pancreatic_test_x = scaler.transform(pancreatic_test_x)
+pancreatic_x = scaler.fit_transform(pancreatic_x)
+new_sample_x = scaler.transform(new_sample_x)
 
 knn = KNeighborsClassifier(n_neighbors=3)
-knn.fit(pancreatic_train_x, pancreatic_train_y)
+knn.fit(pancreatic_x, pancreatic_y)
 
-y_pred_pancreatic = knn.predict(pancreatic_test_x)
+y_pred_pancreatic = knn.predict(new_sample_x)
 
-accuracy = accuracy_score(pancreatic_test_y, y_pred_pancreatic)
-
+accuracy = accuracy_score(new_sample_y, y_pred_pancreatic)
+#
+print(y_pred_pancreatic)
 print(accuracy)
+
+if y_pred_pancreatic == 3:
+    new_sample_second_classification_x = new_sample.drop(columns=["stage"])
+    new_sample_second_classification_y = new_sample["stage"]
+
+    df_second = df_pancreatic[df_pancreatic["diagnosis"] == 3]
+    pancreatic_x_second_classification = df_second.drop(columns=["stage"])
+    pancreatic_y_second_classification = df_second["stage"]
+
+    scaler2 = StandardScaler()
+    pancreatic_x_second_classification = scaler2.fit_transform(pancreatic_x_second_classification)
+    new_sample_second_classification_x = scaler2.transform(new_sample_second_classification_x)
+
+    knn.fit(pancreatic_x_second_classification, pancreatic_y_second_classification)
+
+    y_pred_pancreatic_second_classification = knn.predict(new_sample_second_classification_x)
+
+    accuracy_second_classification = accuracy_score(new_sample_second_classification_y,
+                                                    y_pred_pancreatic_second_classification)
+
+    print(y_pred_pancreatic_second_classification)
+    print(accuracy_second_classification)
