@@ -64,7 +64,6 @@ def cancer_sample_list(request):
 def classify(request):
     try:
         data = json.loads(request.body)
-        print(data)
         if data is None:
             return Response({"error": "data not provided"}, status=400)
         result = classify_sample(data)
@@ -72,6 +71,8 @@ def classify(request):
     except json.JSONDecodeError:
         return Response({"error": "Invalid JSON"}, status=400)
     except Exception as e:
+        print(e)
+        print(type(e))
         return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])

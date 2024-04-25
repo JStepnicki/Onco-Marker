@@ -28,8 +28,8 @@ def classify_sample(sample):
     new_sample = pd.DataFrame([sample], columns=df_pancreatic.columns)
     new_sample.fillna(0, inplace=True)
     
-    print(new_sample)
-    
+
+    print("woof")
     # IF THERE WILL BE NEW VALUE IT WILL CAUSE ERROR
     new_sample['benign_sample_diagnosis'] = benign_sample_diagnosis_encoder.transform(new_sample['benign_sample_diagnosis'].astype(str))
     new_sample['sex'] = sex_encoder.transform(new_sample['sex'])
@@ -42,8 +42,9 @@ def classify_sample(sample):
 
     scaler = StandardScaler()
     pancreatic_x = scaler.fit_transform(pancreatic_x)
-    new_sample_x = scaler.transform(new_sample_x)
 
+    new_sample_x = scaler.transform(new_sample_x)
+    
     knn = KNeighborsClassifier(n_neighbors=3)
     knn.fit(pancreatic_x, pancreatic_y)
 

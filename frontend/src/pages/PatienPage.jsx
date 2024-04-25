@@ -73,8 +73,9 @@ function PatientPage() {
     fetchPatientData();
   }, []);
 
-  const handleKnnClick = async (sample) => {
-    // const new_sample_data = {
+    const handleKnnClick = async (sample) => {
+
+          // const new_sample_data = {
     //   age: 45,
     //   sex: "M",
     //   stage: "II",
@@ -86,26 +87,32 @@ function PatientPage() {
     //   TFF1: 1.1,
     //   REG1A: 0.7,
     // };
-    const markers = JSON.parse(sample.markers_JSON);
-
-    const patientData = {
-      age: patient.age, // assuming patient object has age and sex properties
-      sex: patient.sex ? "M" : "F",
-      stage: sample.stage,
-      benign_sample_diagnosis: sample.benign_sample_diagnosis,
-      ...markers,
-    };
-
-    const response = await fetch(`${import.meta.env.VITE_API_URL}classify/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(patientData),
-    });
-
-    const data = await response.json();
-    console.log(data);
+    
+      const markers = JSON.parse(sample.markers_JSON);
+  
+      const patientData = {
+        age: parseInt(patient.age), 
+        sex: patient.sex ? "M" : "F",
+        stage: sample.stage,
+        benign_sample_diagnosis: sample.benign_sample_diagnosis,
+        plasma_CA19_9: parseFloat(markers.plasma_CA19_9),
+        creatinine: parseFloat(markers.creatinine),
+        LYVE1: parseFloat(markers.LYVE1),
+        REG1B: parseFloat(markers.REG1B),
+        TFF1: parseFloat(markers.TFF1),
+        REG1A: parseFloat(markers.REG1A),
+      };
+  
+      const response = await fetch(`${import.meta.env.VITE_API_URL}classify/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(patientData),
+      });
+  
+      const data = await response.json();
+      console.log(data);
   };
 
   const handleDialogOpen = () => {
@@ -138,7 +145,7 @@ function PatientPage() {
 
     const dataToSend = {
       ...rest,
-      markers_JSON: JSON.stringify(markers),
+      markers_JSON: JSON.stringify(markers),  
     };
 
     const response = await fetch(
