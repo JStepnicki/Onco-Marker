@@ -20,12 +20,13 @@ class Doctor(models.Model):
 class CancerSample(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     organ_type = models.CharField(max_length=255)
-    patient_cohort = models.CharField(max_length=255)
-    sample_origin = models.CharField(max_length=255)
-    markers_JSON = models.TextField()
+    stage = models.CharField(max_length=255, blank=True, null=True)
+    benign_sample_diagnosis = models.CharField(max_length=255, blank=True, null=True)
+    markers_JSON = models.TextField(blank=True, null=True)
 
     def set_markers(self, markers):
         self.markers_JSON = json.dumps(markers)
 
     def get_markers(self):
         return json.loads(self.markers_JSON)
+    

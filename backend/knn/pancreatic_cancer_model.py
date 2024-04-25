@@ -16,20 +16,19 @@ def classify_sample(sample):
     df_pancreatic['stage'] = df_pancreatic['stage'].astype(str) #zmieniam typ danych na string
     benign_sample_diagnosis_encoder = LabelEncoder()
     df_pancreatic['benign_sample_diagnosis'] = benign_sample_diagnosis_encoder.fit_transform(df_pancreatic['benign_sample_diagnosis'])
-
-    # Fit the LabelEncoder on the 'sex' column in df_pancreatic and transform it
+    
     sex_encoder = LabelEncoder()
     df_pancreatic['sex'] = sex_encoder.fit_transform(df_pancreatic['sex'])
 
-    # Fit the LabelEncoder on the 'stage' column in df_pancreatic and transform it
     stage_encoder = LabelEncoder()
     df_pancreatic['stage'] = stage_encoder.fit_transform(df_pancreatic['stage'])
 
-    # new_sample = df_pancreatic.iloc[572].to_frame().T #to jest symulacja nowej probki bo nie wiem jak to bedzie dodawane przez api
 
 
     new_sample = pd.DataFrame([sample], columns=df_pancreatic.columns)
     new_sample.fillna(0, inplace=True)
+    
+    print(new_sample)
     
     # IF THERE WILL BE NEW VALUE IT WILL CAUSE ERROR
     new_sample['benign_sample_diagnosis'] = benign_sample_diagnosis_encoder.transform(new_sample['benign_sample_diagnosis'].astype(str))
