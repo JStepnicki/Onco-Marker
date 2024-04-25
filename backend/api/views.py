@@ -6,7 +6,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from api.models import Doctor, Patient, CancerSample
 from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSerializer
-from backend.ml.pancreatic_cancer_model import classify_sample
+from knn.pancreatic_cancer_model import classify_sample
 
 
 
@@ -64,10 +64,10 @@ def cancer_sample_list(request):
 def classify(request):
     try:
         data = json.loads(request.body)
-        new_sample_data = data.get('new_sample_data')
-        if new_sample_data is None:
+        print(data)
+        if data is None:
             return Response({"error": "new_sample_data or n_neighbors not provided"}, status=400)
-        result = classify_sample(new_sample_data)
+        result = classify_sample(data)
         return Response(result)
     except json.JSONDecodeError:
         return Response({"error": "Invalid JSON"}, status=400)

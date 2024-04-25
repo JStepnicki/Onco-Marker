@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Typography, Card, CardContent, Grid, Paper, Box } from "@mui/material";
+import { Typography, Card, CardContent, Grid, Paper, Box, Button } from "@mui/material";
 import { styled } from "@mui/system";
 
 const Container = styled("div")({
@@ -49,7 +49,7 @@ function PatientPage() {
       REG1A: 0.7,
     };
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}classify`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}classify/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
