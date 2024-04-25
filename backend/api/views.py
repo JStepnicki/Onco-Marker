@@ -64,9 +64,9 @@ def cancer_sample_list(request):
 def classify(request):
     try:
         data = json.loads(request.body)
-        # print(data)
+        print(data)
         if data is None:
-            return Response({"error": "new_sample_data or n_neighbors not provided"}, status=400)
+            return Response({"error": "data not provided"}, status=400)
         result = classify_sample(data)
         return Response(result)
     except json.JSONDecodeError:
@@ -88,15 +88,30 @@ def get_patient_cancer_samples(request, pk):
 
 @api_view(['POST'])
 def add_patient_cancer_sample(request, pk):
-    if request.method == 'POST':
-        try:
-            patient = Patient.objects.get(pk=pk)
-        except Patient.DoesNotExist:
-            return Response(status=404)
-        serializer = CancerSampleSerializer(patient.cancersample_set.all(), many=True)
-        if serializer.is_valid():
-            serializer.save(patient=patient)
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+    data = json.loads(request.body)
+    print(data)
+
+    try:
+        patient = Patient.objects.get(pk=pk)
+    except Patient.DoesNotExist:
+        return Response(status=404)
+    
+    data['patient'] = patient.id
+
+    serializer = CancerSampleSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save(patient=patient)
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
     
 
+
+@api_view(['DELETE'])
+def delete_cancer_sample(request, pk):
+    try:
+        sample = CancerSample.objects.get(pk=pk)
+    except CancerSample.DoesNotExist:
+        return Response(status=404)
+
+    sample.delete()
+    return Response(status=204)
