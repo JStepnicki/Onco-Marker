@@ -1,9 +1,14 @@
+import json
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from api.models import Doctor, Patient, CancerSample
 from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSerializer
+
+from backend.ml.pancreatic_cancer_model import classify_sample
+
 
 @api_view(['GET'])
 def patient_list(request):
@@ -54,6 +59,20 @@ def cancer_sample_list(request):
         serializer = CancerSampleSerializer(cancer_samples, many=True)
         return Response(serializer.data)
     
+
+@api_view(['POST'])
+def classify(request):
+    try:
+        data = json.loads(request.body)
+        new_sample_data = data.get('new_sample_data')
+        if new_sample_data is None:
+            return Response({"error": "new_sample_data or n_neighbors not provided"}, status=400)
+        result = classify_sample(new_sample_data)
+        return Response(result)
+    except json.JSONDecodeError:
+        return Response({"error": "Invalid JSON"}, status=400)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
 def get_patient_cancer_samples(request, pk):
