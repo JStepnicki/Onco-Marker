@@ -14,21 +14,30 @@ def classify_sample(sample):
     df_pancreatic.fillna(0, inplace=True) #uzupelnia brakujace wartosci zerami (nan -> 0)
     df_pancreatic['benign_sample_diagnosis'] = df_pancreatic['benign_sample_diagnosis'].astype(str)
     df_pancreatic['stage'] = df_pancreatic['stage'].astype(str) #zmieniam typ danych na string
-    label_encoder = LabelEncoder()
-    df_pancreatic['benign_sample_diagnosis'] = label_encoder.fit_transform(df_pancreatic['benign_sample_diagnosis'])
-    df_pancreatic['sex'] = label_encoder.fit_transform(df_pancreatic['sex'])
-    df_pancreatic['stage'] = label_encoder.fit_transform(df_pancreatic['stage']) #zmieniam stringi na liczby za pomoca label encodera
+    benign_sample_diagnosis_encoder = LabelEncoder()
+    df_pancreatic['benign_sample_diagnosis'] = benign_sample_diagnosis_encoder.fit_transform(df_pancreatic['benign_sample_diagnosis'])
 
-    new_sample = df_pancreatic.iloc[572].to_frame().T #to jest symulacja nowej probki bo nie wiem jak to bedzie dodawane przez api
-    print(new_sample)
+    # Fit the LabelEncoder on the 'sex' column in df_pancreatic and transform it
+    sex_encoder = LabelEncoder()
+    df_pancreatic['sex'] = sex_encoder.fit_transform(df_pancreatic['sex'])
+
+    # Fit the LabelEncoder on the 'stage' column in df_pancreatic and transform it
+    stage_encoder = LabelEncoder()
+    df_pancreatic['stage'] = stage_encoder.fit_transform(df_pancreatic['stage'])
+
+    # new_sample = df_pancreatic.iloc[572].to_frame().T #to jest symulacja nowej probki bo nie wiem jak to bedzie dodawane przez api
+
+
+    new_sample = pd.DataFrame([sample], columns=df_pancreatic.columns)
+    new_sample.fillna(0, inplace=True)
     
-    new_sample = pd.DataFrame(sample, columns=df_pancreatic.columns).to_frame().T
-    
-    print(new_sample)
+    # IF THERE WILL BE NEW VALUE IT WILL CAUSE ERROR
+    new_sample['benign_sample_diagnosis'] = benign_sample_diagnosis_encoder.transform(new_sample['benign_sample_diagnosis'].astype(str))
+    new_sample['sex'] = sex_encoder.transform(new_sample['sex'])
+    new_sample['stage'] = stage_encoder.transform(new_sample['stage'])
+
     
     new_sample_x = new_sample.drop(columns=["diagnosis"])
-    new_sample_y = new_sample["diagnosis"]
-
     pancreatic_x = df_pancreatic.drop(columns=["diagnosis"])
     pancreatic_y = df_pancreatic["diagnosis"]
 
@@ -40,15 +49,11 @@ def classify_sample(sample):
     knn.fit(pancreatic_x, pancreatic_y)
 
     y_pred_pancreatic = knn.predict(new_sample_x)
+    y_pred_pancreatic_second_classification = None
 
-    accuracy = accuracy_score(new_sample_y, y_pred_pancreatic)
-    #
-    print(y_pred_pancreatic)
-    print(accuracy)
 
     if y_pred_pancreatic == 3: #tu sie zaczyna druga klasyfikacja
         new_sample_second_classification_x = new_sample.drop(columns=["stage"]) #to jest dalej symulacja nowej probki (tej samej co w 1 klasyfikacji) bo nie wiem jak to bedzie dodawane przez api
-        new_sample_second_classification_y = new_sample["stage"]
 
         df_second = df_pancreatic[df_pancreatic["diagnosis"] == 3] #tutaj ucinam dataframe tylko do tych wierszy co maja diagnosis 3 i tym samym maja jakas wartosc stage
         pancreatic_x_second_classification = df_second.drop(columns=["stage"])
@@ -62,11 +67,5 @@ def classify_sample(sample):
 
         y_pred_pancreatic_second_classification = knn.predict(new_sample_second_classification_x)
 
-        accuracy_second_classification = accuracy_score(new_sample_second_classification_y,
-                                                        y_pred_pancreatic_second_classification)
 
-        print(y_pred_pancreatic_second_classification)
-        print(accuracy_second_classification)
-
-
-# classify_sample([572, 1, 1, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0]) #to jest symulacja nowej probki bo nie wiem jak to bedzie dodawane przez api
+    return y_pred_pancreatic, y_pred_pancreatic_second_classification

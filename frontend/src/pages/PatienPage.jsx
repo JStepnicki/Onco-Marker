@@ -38,9 +38,9 @@ function PatientPage() {
   const handleKnnClick = async () => {
     const new_sample_data = {
       age: 45,
-      sex: "Male",
-      stage: "Stage II",
-      benign_sample_diagnosis: "Benign",
+      sex: "M",
+      stage: "II",
+      benign_sample_diagnosis: "Abdominal Pain",
       plasma_CA19_9: 37.0,
       creatinine: 0.9,
       LYVE1: 1.2,
