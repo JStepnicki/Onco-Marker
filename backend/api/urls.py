@@ -15,4 +15,5 @@ urlpatterns = [
     path('patients/cancer_samples/add/<int:pk>/', add_patient_cancer_sample, name='add-patient-cancer-sample'),
     path('patients/cancer_samples/delete/<int:pk>/', delete_cancer_sample, name='delete-cancer-sample'),
     path('classify/', classify, name='classify'),
+    path('add_doctor/', add_doctor),
 ]

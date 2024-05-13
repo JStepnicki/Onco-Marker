@@ -8,6 +8,23 @@ from api.models import Doctor, Patient, CancerSample
 from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSerializer
 from knn.pancreatic_cancer_model import classify_sample
 
+# such request to create a doctor, name and surname are optional
+# {
+#     "user": {
+#         "email": "doctor@example.com",
+#         "password": "securepassword"
+#     },
+#     "name": "Doctor Name",
+#     "surname": "Doctor Surname"
+# }
+@api_view(['POST'])
+def add_doctor(request):
+    if request.method == 'POST':
+        serializer = DoctorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
 
 @api_view(['GET'])

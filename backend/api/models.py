@@ -4,9 +4,9 @@ from django.contrib.auth.models import User
 
 
 class Patient(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     surname = models.CharField(max_length=255)
+    email = models.EmailField()
     age = models.IntegerField()
     sex = models.BooleanField()
 
@@ -16,8 +16,9 @@ class Patient(models.Model):
 
 
 class Doctor(models.Model):
-    name = models.CharField(max_length=255)
-    surname = models.CharField(max_length=255)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    surname = models.CharField(max_length=255, blank=True, null=True)
 
 
 class CancerSample(models.Model):
