@@ -1,14 +1,17 @@
 from django.db import models
-import json
 
-
+from django.contrib.auth.models import User
 
 
 class Patient(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     surname = models.CharField(max_length=255)
     age = models.IntegerField()
     sex = models.BooleanField()
+
+
+
     
 
 
@@ -22,11 +25,11 @@ class CancerSample(models.Model):
     organ_type = models.CharField(max_length=255)
     stage = models.CharField(max_length=255, blank=True, null=True)
     benign_sample_diagnosis = models.CharField(max_length=255, blank=True, null=True)
-    markers_JSON = models.TextField(blank=True, null=True)
+    markers_JSON = models.JSONField(blank=True, null=True)
 
     def set_markers(self, markers):
-        self.markers_JSON = json.dumps(markers)
+        self.markers_JSON = markers
 
     def get_markers(self):
-        return json.loads(self.markers_JSON)
+        return self.markers_JSON
     
