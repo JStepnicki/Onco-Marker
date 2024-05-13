@@ -114,6 +114,7 @@ function PatientList() {
           <TableHead>
             <TableRow>
               <TableCell>Name and Surname</TableCell>
+              <TableCell align="right">Email</TableCell>
               <TableCell align="right">Age</TableCell>
               <TableCell align="right">Gender</TableCell>
               <TableCell align="right">Actions</TableCell>
@@ -123,6 +124,7 @@ function PatientList() {
             {displayedPatients.map((patient) => (
               <TableRow key={patient.id}>
                 <TableCell>{patient.name} {patient.surname}</TableCell>
+                <TableCell align="right">{patient.email}</TableCell>
                 <TableCell align="right">{patient.age}</TableCell>
                 <TableCell align="right">{patient.sex == true ? 'Male' : 'Female'}</TableCell>
                 <TableCell align="right">
