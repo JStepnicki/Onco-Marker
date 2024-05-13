@@ -278,7 +278,12 @@ function PatientPage() {
                 Benign Sample Diagnosis {sample.benign_sample_diagnosis}
               </Typography>
               <Typography variant="body2">
-                Sample Markers: {sample.markers_JSON}
+                Sample Markers:{" "}
+                {JSON.parse(sample.markers_JSON) &&
+                  Object.entries(JSON.parse(sample.markers_JSON)).map(
+                    ([key, value]) =>
+                      value && <div key={key}>{`${key}: ${value}`}</div>
+                  )}
               </Typography>
             </CardContent>
           </Card>
