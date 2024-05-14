@@ -98,7 +98,7 @@ function PatientPage() {
 
     console.log(data);
     sample.diagnosis = data[0];
-    sample.stage = "II"
+    sample.stage = data[0]
     console.log(sample);
   
     // Send a PUT request to the update endpoint
@@ -181,6 +181,15 @@ function PatientPage() {
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Add New Sample</DialogTitle>
         <DialogContent>
+        <TextField
+            margin="dense"
+            name="organ_type"
+            label="Organ Type"
+            type="text"
+            fullWidth
+            value={newSampleData.organ_type}
+            onChange={handleInputChange}
+          />
           <TextField
             margin="dense"
             name="benign_sample_diagnosis"
@@ -274,8 +283,9 @@ function PatientPage() {
         <Sample key={sample.id}>
           <Card>
             <CardContent>
-              <Typography variant="body-2">Diagnosis: {sample.diagnosi}</Typography>
-              <Typography variant="body2">Stage: {sample.stage}</Typography>
+            <Typography variant="body-2" style={{ display: 'block' }}>Organ Type: {sample.organ_type}</Typography>
+            <Typography variant="body-2" style={{ display: 'block' }}>Diagnosis: {sample.diagnosis}</Typography>
+            <Typography variant="body2" style={{ display: 'block' }}>Stage: {sample.stage}</Typography>
               <Typography variant="body2">
                 Benign Sample Diagnosis {sample.benign_sample_diagnosis}
               </Typography>

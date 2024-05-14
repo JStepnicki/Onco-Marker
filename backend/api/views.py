@@ -107,6 +107,7 @@ def classify(request):
     except json.JSONDecodeError:
         return Response({"error": "Invalid JSON"}, status=400)
     except Exception as e:
+        print(e)
         return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
@@ -137,6 +138,7 @@ def add_patient_cancer_sample(request, pk):
     if serializer.is_valid():
         serializer.save(patient=patient)
         return Response(serializer.data, status=201)
+    print(serializer.errors)
     return Response(serializer.errors, status=400)
     
 
