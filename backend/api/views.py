@@ -148,11 +148,11 @@ def register(request):
 
 @api_view(['POST'])
 def user_login(request):
-    email = request.data.get('email')
+    username = request.data.get('username')
     password = request.data.get('password')
 
-    user = authenticate(request, email=email, password=password)
-
+    user = authenticate(request, username=username, password=password)
+    print(user)
     if user is not None:
         login(request, user)
         return JsonResponse({'message': 'Zalogowano pomyślnie'})
