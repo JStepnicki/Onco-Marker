@@ -2,20 +2,28 @@ import React, { useState } from 'react';
 import { Button, TextField, Box, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
-import app from '../../../firebase';
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const auth = getAuth(app);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const response = await fetch('http://localhost:8000/api/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid email or password');
+      }
+
       navigate('/doctors');
     } catch (error) {
       console.error('Error signing in:', error);
@@ -25,11 +33,22 @@ function Login() {
 
   const handleForgotPassword = async () => {
     try {
-      await sendPasswordResetEmail(auth, email);
+      const response = await fetch('http://localhost:8000/api/reset_password/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send reset email. Check your email address.');
+      }
+
       alert('Password reset email sent. Check your inbox!');
     } catch (error) {
       console.error('Error sending reset email:', error);
-      alert('Failed to send reset email. Check your email address.');
+      alert(error.message || 'Failed to send reset email. Check your email address.');
     }
   };
 

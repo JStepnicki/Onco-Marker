@@ -1,24 +1,33 @@
 import React, { useState } from 'react';
 import { Button, TextField, Box, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import './Register.css';
-import app from '../../../firebase';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'; // Dodaj import Firebase Auth
 
 function Register() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const auth = getAuth(app); // Pobierz auth z Firebase app
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const response = await fetch('http://localhost:8000/api/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Something went wrong');
+      }
+
       navigate('/');
     } catch (error) {
-      console.error('Error signing up:', error);
+      setError(error.message);
     }
   };
 
@@ -42,6 +51,7 @@ function Register() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {error && <p style={{ color: 'red' }}>{error}</p>}
         <Button variant="contained" color="primary" type="submit" fullWidth>
           Submit
         </Button>

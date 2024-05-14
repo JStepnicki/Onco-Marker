@@ -3,11 +3,13 @@ import json
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model, authenticate, login
 from api.models import Doctor, Patient, CancerSample
 from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSerializer
 from knn.pancreatic_cancer_model import classify_sample
-
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.forms import PasswordResetForm
 # such request to create a doctor, name and surname are optional
 # {
 #     "user": {
@@ -132,3 +134,44 @@ def delete_cancer_sample(request, pk):
 
     sample.delete()
     return Response(status=204)
+
+@api_view(['POST'])
+def register(request):
+    email = request.POST.get('email')
+    password = request.POST.get('password')
+
+    if get_user_model().objects.filter(email=email).exists():
+        return JsonResponse({'error': 'Użytkownik o podanym adresie email już istnieje'}, status=400)
+    user = get_user_model().objects.create_user(email=email, password=password)
+    return JsonResponse({'message': 'Rejestracja zakończona pomyślnie'})
+
+@api_view(['POST'])
+def user_login(request):
+    email = request.POST.get('email')
+    password = request.POST.get('password')
+
+    user = authenticate(request, email=email, password=password)
+
+    if user is not None:
+        login(request, user)
+        return JsonResponse({'message': 'Zalogowano pomyślnie'})
+    else:
+        return JsonResponse({'error': 'Nieprawidłowy email lub hasło'}, status=400)
+
+@api_view(['POST'])
+def reset_password(request):
+    email = request.POST.get('email')
+
+    form = PasswordResetForm({'email': email})
+
+    if form.is_valid():
+        form.save(
+            request=request,
+            use_https=request.is_secure(),
+            token_generator=default_token_generator,
+            from_email=None,
+            email_template_name='registration/password_reset_email.html',
+        )
+        return JsonResponse({'message': 'Email resetujący hasło został wysłany. Sprawdź swoją skrzynkę odbiorczą.'})
+    else:
+        return JsonResponse({'error': 'Nieprawidłowy adres email'}, status=400)
