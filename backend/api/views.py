@@ -83,7 +83,6 @@ def cancer_sample_list(request):
 def classify(request):
     try:
         data = json.loads(request.body)
-        print(data)
         if data is None:
             return Response({"error": "data not provided"}, status=400)
         result = classify_sample(data)
