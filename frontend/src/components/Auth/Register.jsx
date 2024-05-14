@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Register() {
   const navigate = useNavigate();
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -17,7 +18,7 @@ function Register() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       if (!response.ok) {
@@ -34,6 +35,14 @@ function Register() {
   return (
     <Grid container justifyContent="center" alignItems="center" className="register-container">
       <Box component="form" onSubmit={handleSubmit} className="register-form">
+        <TextField
+          label="Username"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
         <TextField
           label="Email"
           variant="outlined"

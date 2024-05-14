@@ -137,18 +137,19 @@ def delete_cancer_sample(request, pk):
 
 @api_view(['POST'])
 def register(request):
-    email = request.POST.get('email')
-    password = request.POST.get('password')
+    email = request.data.get('email')
+    password = request.data.get('password')
+    username = request.data.get('username')
 
     if get_user_model().objects.filter(email=email).exists():
         return JsonResponse({'error': 'Użytkownik o podanym adresie email już istnieje'}, status=400)
-    user = get_user_model().objects.create_user(email=email, password=password)
+    user = get_user_model().objects.create_user(username=username, email=email, password=password)
     return JsonResponse({'message': 'Rejestracja zakończona pomyślnie'})
 
 @api_view(['POST'])
 def user_login(request):
-    email = request.POST.get('email')
-    password = request.POST.get('password')
+    email = request.data.get('email')
+    password = request.data.get('password')
 
     user = authenticate(request, email=email, password=password)
 
@@ -160,8 +161,7 @@ def user_login(request):
 
 @api_view(['POST'])
 def reset_password(request):
-    email = request.POST.get('email')
-
+    email = request.data.get('email')
     form = PasswordResetForm({'email': email})
 
     if form.is_valid():
