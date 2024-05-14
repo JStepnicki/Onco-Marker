@@ -33,4 +33,4 @@ class PatientSerializer(ModelSerializer):
 class CancerSampleSerializer(ModelSerializer):
     class Meta:
         model = CancerSample
-        fields = ('id', 'patient', 'stage', 'benign_sample_diagnosis' ,'markers_JSON')
+        fields = ('id', 'patient', 'stage', 'benign_sample_diagnosis' ,'markers_JSON', 'timestamp', 'diagnosis', 'organ_type')
