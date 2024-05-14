@@ -1,9 +1,14 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Typography, Card, CardContent } from "@mui/material";
 
-function ResultsPage({ result, sample }) {
+function ResultsPage() {
+  const location = useLocation();
+  const sample = location.state.sample;
+
+
   let diagnosis = '';
-  switch(result[0]) {
+  switch(sample.diagnosis) {
     case 1:
       diagnosis = 'Patient does not have cancer.';
       break;
@@ -22,7 +27,7 @@ function ResultsPage({ result, sample }) {
       <CardContent>
         <Typography variant="h5">Diagnosis Results</Typography>
         <Typography variant="body1">{diagnosis}</Typography>
-        {result[0] > 1 && <Typography variant="body1">Stage: {result[1]}</Typography>}
+        {sample.diagnosis > 1 && <Typography variant="body1">Stage: {sample.stage}</Typography>}
         <Typography variant="body2">Sample Information:</Typography>
         <Typography variant="body2">Stage: {sample.stage}</Typography>
         <Typography variant="body2">Benign Sample Diagnosis: {sample.benign_sample_diagnosis}</Typography>

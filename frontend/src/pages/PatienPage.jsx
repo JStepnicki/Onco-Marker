@@ -1,6 +1,6 @@
 import ResultsPage from './ResultsPage';
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Typography,
   Card,
@@ -47,6 +47,7 @@ function PatientPage() {
     TFF1: "",
     REG1A: "",
   });
+  const navigate = useNavigate();
   const location = useLocation();
   const patient = location.state.patient;
 
@@ -116,6 +117,7 @@ function PatientPage() {
   
     // Update the samplesData array
     setSamplesData(samplesData.map(item => item.id === sample.id ? sample : item));
+    navigate(`/patients/${patient.id}/results`, { state: { sample} });
   };
 
   const handleDialogOpen = () => {
