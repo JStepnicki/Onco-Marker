@@ -1,6 +1,7 @@
-import ResultsPage from './ResultsPage';
+import ResultsPage from "./ResultsPage";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   Typography,
   Card,
@@ -38,7 +39,6 @@ function PatientPage() {
   const [samplesData, setSamplesData] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newSampleData, setNewSampleData] = useState({
-    stage: "",
     benign_sample_diagnosis: "",
     plasma_CA19_9: "",
     creatinine: "",
@@ -52,72 +52,65 @@ function PatientPage() {
   const patient = location.state.patient;
 
   const handleDeleteClick = async (sampleId) => {
-    const response = await fetch(
-      `${
-        import.meta.env.VITE_API_URL
-      }patients/cancer_samples/delete/${sampleId}/`,
-      {
-        method: "DELETE",
-      }
-    );
-    setSamplesData(samplesData.filter((sample) => sample.id !== sampleId));
+    try {
+      const response = await axios.delete(
+        `${
+          import.meta.env.VITE_API_URL
+        }patients/cancer_samples/delete/${sampleId}/`
+      );
+      setSamplesData(samplesData.filter((sample) => sample.id !== sampleId));
+    } catch (error) {
+      navigate("/error", {
+        state: { status: error.response.status, message: error.message },
+      });
+    }
   };
 
   useEffect(() => {
     const fetchPatientData = async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}patients/cancer_samples/${patient.id}/`
-      );
-      const data = await response.json();
-      setSamplesData(data);
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}patients/cancer_samples/${
+            patient.id
+          }/`
+        );
+        setSamplesData(response.data);
+      } catch (error) {
+        navigate("/error", {
+          state: { status: error.response.status, message: error.message },
+        });
+      }
     };
 
     fetchPatientData();
   }, []);
 
   const handleKnnClick = async (sample) => {
-
-    const markers = JSON.parse(sample.markers_JSON);
-
-    const patientData = {
-      age: patient.age, // assuming patient object has age and sex properties
-      sex: patient.sex ? "M" : "F",
-      stage: sample.stage,
-      benign_sample_diagnosis: sample.benign_sample_diagnosis,
-      ...markers,
-    };
-
-    const response = await fetch(`${import.meta.env.VITE_API_URL}classify/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(patientData),
-    });
-
-    const data = await response.json();
-
-    console.log(data);
-    sample.diagnosis = data[0];
-    sample.stage = data[0]
-    console.log(sample);
+    try {
+      const markers = JSON.parse(sample.markers_JSON);
   
-    // Send a PUT request to the update endpoint
-    const updateResponse = await fetch(`${import.meta.env.VITE_API_URL}patients/cancer_samples/update/${sample.id}/`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(sample),
-    });
+      const patientData = {
+        age: patient.age,
+        sex: patient.sex ? "M" : "F",
+        stage: sample.stage,
+        benign_sample_diagnosis: sample.benign_sample_diagnosis,
+        ...markers,
+      };
   
-    if (!updateResponse.ok) {
-      throw new Error('Failed to update sample');
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}classify/`, patientData);
+  
+      const data = response.data;
+  
+      sample.diagnosis = data[0];
+      sample.stage = data[0]
+  
+      const updateResponse = await axios.put(`${import.meta.env.VITE_API_URL}patients/cancer_samples/update/${sample.id}/`, sample);
+  
+      setSamplesData(samplesData.map(item => item.id === sample.id ? sample : item));
+      navigate(`/patients/${patient.id}/results`, { state: { sample} });
+    } catch (error) {
+      navigate('/error', { state: { status: error.response.status, message: error.message } });
     }
-  
-    // Update the samplesData array
-    setSamplesData(samplesData.map(item => item.id === sample.id ? sample : item));
-    navigate(`/patients/${patient.id}/results`, { state: { sample} });
   };
 
   const handleDialogOpen = () => {
@@ -153,26 +146,28 @@ function PatientPage() {
       markers_JSON: JSON.stringify(markers),
     };
 
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}patients/cancer_samples/add/${
-        patient.id
-      }/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSend),
-      }
-    );
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}patients/cancer_samples/add/${
+          patient.id
+        }/`,
+        dataToSend
+      );
 
-    if (response.ok) {
-      const new_sample = await response.json();
-      setSamplesData([...samplesData, new_sample]);
-    } else {
-      console.error("Failed to add sample");
+      if (response.status === 201) {
+        const new_sample = response.data;
+        setSamplesData([...samplesData, new_sample]);
+        handleDialogClose();
+      } else {
+            navigate("/error", {
+          state: { status: error.response.status, message: error.message },
+        });
+      }
+    } catch (error) {
+      navigate("/error", {
+        state: { status: error.response.status, message: error.message },
+      });
     }
-    handleDialogClose();
   };
 
   return (
@@ -183,7 +178,7 @@ function PatientPage() {
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Add New Sample</DialogTitle>
         <DialogContent>
-        <TextField
+          <TextField
             margin="dense"
             name="organ_type"
             label="Organ Type"
@@ -285,9 +280,15 @@ function PatientPage() {
         <Sample key={sample.id}>
           <Card>
             <CardContent>
-            <Typography variant="body-2" style={{ display: 'block' }}>Organ Type: {sample.organ_type}</Typography>
-            <Typography variant="body-2" style={{ display: 'block' }}>Diagnosis: {sample.diagnosis}</Typography>
-            <Typography variant="body2" style={{ display: 'block' }}>Stage: {sample.stage}</Typography>
+              <Typography variant="body-2" style={{ display: "block" }}>
+                Organ Type: {sample.organ_type}
+              </Typography>
+              <Typography variant="body-2" style={{ display: "block" }}>
+                Diagnosis: {sample.diagnosis}
+              </Typography>
+              <Typography variant="body2" style={{ display: "block" }}>
+                Stage: {sample.stage}
+              </Typography>
               <Typography variant="body2">
                 Benign Sample Diagnosis {sample.benign_sample_diagnosis}
               </Typography>
