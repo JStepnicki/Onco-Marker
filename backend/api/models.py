@@ -27,6 +27,8 @@ class CancerSample(models.Model):
     stage = models.CharField(max_length=255, blank=True, null=True)
     benign_sample_diagnosis = models.CharField(max_length=255, blank=True, null=True)
     markers_JSON = models.JSONField(blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    diagnosis = models.CharField(max_length=255, blank=True, null=True)
 
     def set_markers(self, markers):
         self.markers_JSON = markers

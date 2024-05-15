@@ -1,5 +1,6 @@
+import ResultsPage from './ResultsPage';
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Typography,
   Card,
@@ -46,6 +47,7 @@ function PatientPage() {
     TFF1: "",
     REG1A: "",
   });
+  const navigate = useNavigate();
   const location = useLocation();
   const patient = location.state.patient;
 
@@ -74,18 +76,7 @@ function PatientPage() {
   }, []);
 
   const handleKnnClick = async (sample) => {
-    // const new_sample_data = {
-    //   age: 45,
-    //   sex: "M",
-    //   stage: "II",
-    //   benign_sample_diagnosis: "Abdominal Pain",
-    //   plasma_CA19_9: 37.0,
-    //   creatinine: 0.9,
-    //   LYVE1: 1.2,
-    //   REG1B: 0.8,
-    //   TFF1: 1.1,
-    //   REG1A: 0.7,
-    // };
+
     const markers = JSON.parse(sample.markers_JSON);
 
     const patientData = {
@@ -105,7 +96,28 @@ function PatientPage() {
     });
 
     const data = await response.json();
+
     console.log(data);
+    sample.diagnosis = data[0];
+    sample.stage = data[0]
+    console.log(sample);
+  
+    // Send a PUT request to the update endpoint
+    const updateResponse = await fetch(`${import.meta.env.VITE_API_URL}patients/cancer_samples/update/${sample.id}/`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(sample),
+    });
+  
+    if (!updateResponse.ok) {
+      throw new Error('Failed to update sample');
+    }
+  
+    // Update the samplesData array
+    setSamplesData(samplesData.map(item => item.id === sample.id ? sample : item));
+    navigate(`/patients/${patient.id}/results`, { state: { sample} });
   };
 
   const handleDialogOpen = () => {
@@ -171,13 +183,13 @@ function PatientPage() {
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Add New Sample</DialogTitle>
         <DialogContent>
-          <TextField
+        <TextField
             margin="dense"
-            name="stage"
-            label="Stage"
+            name="organ_type"
+            label="Organ Type"
             type="text"
             fullWidth
-            value={newSampleData.stage}
+            value={newSampleData.organ_type}
             onChange={handleInputChange}
           />
           <TextField
@@ -273,7 +285,9 @@ function PatientPage() {
         <Sample key={sample.id}>
           <Card>
             <CardContent>
-              <Typography variant="body2">Stage: {sample.stage}</Typography>
+            <Typography variant="body-2" style={{ display: 'block' }}>Organ Type: {sample.organ_type}</Typography>
+            <Typography variant="body-2" style={{ display: 'block' }}>Diagnosis: {sample.diagnosis}</Typography>
+            <Typography variant="body2" style={{ display: 'block' }}>Stage: {sample.stage}</Typography>
               <Typography variant="body2">
                 Benign Sample Diagnosis {sample.benign_sample_diagnosis}
               </Typography>
@@ -284,6 +298,9 @@ function PatientPage() {
                     ([key, value]) =>
                       value && <div key={key}>{`${key}: ${value}`}</div>
                   )}
+              </Typography>
+              <Typography variant="body2">
+                Timestamp: {new Date(sample.timestamp).toLocaleString()}
               </Typography>
             </CardContent>
           </Card>

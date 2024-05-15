@@ -71,6 +71,23 @@ def update_patient(request, pk):
     return Response(serializer.errors, status=400)
 
 
+@api_view(['PUT'])
+def update_cancer_sample(request, pk):
+    print(request.body)
+    try:
+        sample = CancerSample.objects.get(pk=pk)
+    except CancerSample.DoesNotExist:
+        return Response(status=404)
+
+    data = json.loads(request.body)
+
+    serializer = CancerSampleSerializer(sample, data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=200)
+    print(serializer.errors)
+    return Response(serializer.errors, status=400)
+
 @api_view(['GET'])
 def cancer_sample_list(request):
     if request.method == 'GET':
@@ -90,6 +107,7 @@ def classify(request):
     except json.JSONDecodeError:
         return Response({"error": "Invalid JSON"}, status=400)
     except Exception as e:
+        print(e)
         return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
@@ -120,6 +138,7 @@ def add_patient_cancer_sample(request, pk):
     if serializer.is_valid():
         serializer.save(patient=patient)
         return Response(serializer.data, status=201)
+    print(serializer.errors)
     return Response(serializer.errors, status=400)
     
 

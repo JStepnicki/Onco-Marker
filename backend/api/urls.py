@@ -14,9 +14,11 @@ urlpatterns = [
     path('patients/cancer_samples/<int:pk>/', get_patient_cancer_samples, name='get-patient-cancer-samples'),
     path('patients/cancer_samples/add/<int:pk>/', add_patient_cancer_sample, name='add-patient-cancer-sample'),
     path('patients/cancer_samples/delete/<int:pk>/', delete_cancer_sample, name='delete-cancer-sample'),
+    path('patients/cancer_samples/update/<int:pk>/', update_cancer_sample, name='update-cancer-sample'),
     path('classify/', classify, name='classify'),
     path('add_doctor/', add_doctor),
     path('register/', register, name='register'),
     path('login/', user_login, name='login'),
     path('reset_password/', reset_password, name='reset_password'),
+    
 ]
