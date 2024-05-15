@@ -88,7 +88,7 @@ function PatientPage() {
   const handleKnnClick = async (sample) => {
     try {
       const markers = JSON.parse(sample.markers_JSON);
-  
+
       const patientData = {
         age: patient.age,
         sex: patient.sex ? "M" : "F",
@@ -96,20 +96,32 @@ function PatientPage() {
         benign_sample_diagnosis: sample.benign_sample_diagnosis,
         ...markers,
       };
-  
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}classify/`, patientData);
-  
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}classify/`,
+        patientData
+      );
+
       const data = response.data;
-  
+
       sample.diagnosis = data[0];
-      sample.stage = data[0]
-  
-      const updateResponse = await axios.put(`${import.meta.env.VITE_API_URL}patients/cancer_samples/update/${sample.id}/`, sample);
-  
-      setSamplesData(samplesData.map(item => item.id === sample.id ? sample : item));
-      navigate(`/patients/${patient.id}/results`, { state: { sample} });
+      sample.stage = data[0];
+
+      const updateResponse = await axios.put(
+        `${import.meta.env.VITE_API_URL}patients/cancer_samples/update/${
+          sample.id
+        }/`,
+        sample
+      );
+
+      setSamplesData(
+        samplesData.map((item) => (item.id === sample.id ? sample : item))
+      );
+      navigate(`/patients/${patient.id}/results`, { state: { sample } });
     } catch (error) {
-      navigate('/error', { state: { status: error.response.status, message: error.message } });
+      navigate("/error", {
+        state: { status: error.response.status, message: error.message },
+      });
     }
   };
 
@@ -159,7 +171,7 @@ function PatientPage() {
         setSamplesData([...samplesData, new_sample]);
         handleDialogClose();
       } else {
-            navigate("/error", {
+        navigate("/error", {
           state: { status: error.response.status, message: error.message },
         });
       }
@@ -276,51 +288,59 @@ function PatientPage() {
         </Grid>
       </Grid>
 
-      {samplesData.map((sample) => (
-        <Sample key={sample.id}>
-          <Card>
-            <CardContent>
-              <Typography variant="body-2" style={{ display: "block" }}>
-                Organ Type: {sample.organ_type}
-              </Typography>
-              <Typography variant="body-2" style={{ display: "block" }}>
-                Diagnosis: {sample.diagnosis}
-              </Typography>
-              <Typography variant="body2" style={{ display: "block" }}>
-                Stage: {sample.stage}
-              </Typography>
-              <Typography variant="body2">
-                Benign Sample Diagnosis {sample.benign_sample_diagnosis}
-              </Typography>
-              <Typography variant="body2">
-                Markers:{" "}
-                {JSON.parse(sample.markers_JSON) &&
-                  Object.entries(JSON.parse(sample.markers_JSON)).map(
-                    ([key, value]) =>
-                      value && <div key={key}>{`${key}: ${value}`}</div>
-                  )}
-              </Typography>
-              <Typography variant="body2">
-                Timestamp: {new Date(sample.timestamp).toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleKnnClick(sample)}
-          >
-            Generate KNN Output
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => handleDeleteClick(sample.id)}
-          >
-            Delete Sample
-          </Button>
-        </Sample>
-      ))}
+      {samplesData
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .map((sample) => (
+          <Sample key={sample.id}>
+            <Card>
+              <CardContent>
+                <Typography variant="body-2" style={{ display: "block" }}>
+                  Organ Type: {sample.organ_type}
+                </Typography>
+                <Typography variant="body-2" style={{ display: "block" }}>
+                  Diagnosis: {sample.diagnosis}
+                </Typography>
+                <Typography variant="body2" style={{ display: "block" }}>
+                  Stage: {sample.stage}
+                </Typography>
+                <Typography variant="body2">
+                  Benign Sample Diagnosis {sample.benign_sample_diagnosis}
+                </Typography>
+                <Typography variant="body2">
+                  {JSON.parse(sample.markers_JSON) &&
+                    Object.values(JSON.parse(sample.markers_JSON)).some(
+                      (value) => value
+                    ) && (
+                      <>
+                        Markers:{" "}
+                        {Object.entries(JSON.parse(sample.markers_JSON)).map(
+                          ([key, value]) =>
+                            value && <div key={key}>{`${key}: ${value}`}</div>
+                        )}
+                      </>
+                    )}
+                </Typography>
+                <Typography variant="body2">
+                  Timestamp: {new Date(sample.timestamp).toLocaleString()}
+                </Typography>
+              </CardContent>
+            </Card>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleKnnClick(sample)}
+            >
+              Generate KNN Output
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => handleDeleteClick(sample.id)}
+            >
+              Delete Sample
+            </Button>
+          </Sample>
+        ))}
     </Container>
   );
 }
