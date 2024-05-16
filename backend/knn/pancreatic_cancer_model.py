@@ -47,7 +47,7 @@ def classify_sample(sample):
     knn = KNeighborsClassifier(n_neighbors=3)
     knn.fit(pancreatic_x, pancreatic_y)
 
-    y_pred_pancreatic = knn.predict(new_sample_x)
+    y_pred_pancreatic = knn.predict(new_sample_x)[0]
     y_pred_pancreatic_second_classification = None
 
 
@@ -64,7 +64,7 @@ def classify_sample(sample):
 
         knn.fit(pancreatic_x_second_classification, pancreatic_y_second_classification)
 
-        y_pred_pancreatic_second_classification = knn.predict(new_sample_second_classification_x)
+        y_pred_pancreatic_second_classification = knn.predict(new_sample_second_classification_x)[0]
 
 
     return y_pred_pancreatic, y_pred_pancreatic_second_classification

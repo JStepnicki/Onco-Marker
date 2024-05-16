@@ -1,5 +1,7 @@
+import ResultsPage from "./ResultsPage";
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   Typography,
   Card,
@@ -37,7 +39,6 @@ function PatientPage() {
   const [samplesData, setSamplesData] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newSampleData, setNewSampleData] = useState({
-    stage: "",
     benign_sample_diagnosis: "",
     plasma_CA19_9: "",
     creatinine: "",
@@ -46,66 +47,84 @@ function PatientPage() {
     TFF1: "",
     REG1A: "",
   });
+  const navigate = useNavigate();
   const location = useLocation();
   const patient = location.state.patient;
 
   const handleDeleteClick = async (sampleId) => {
-    const response = await fetch(
-      `${
-        import.meta.env.VITE_API_URL
-      }patients/cancer_samples/delete/${sampleId}/`,
-      {
-        method: "DELETE",
-      }
-    );
-    setSamplesData(samplesData.filter((sample) => sample.id !== sampleId));
+    try {
+      const response = await axios.delete(
+        `${
+          import.meta.env.VITE_API_URL
+        }patients/cancer_samples/delete/${sampleId}/`
+      );
+      setSamplesData(samplesData.filter((sample) => sample.id !== sampleId));
+    } catch (error) {
+      navigate("/error", {
+        state: { status: error.response.status, message: error.message },
+      });
+    }
   };
 
   useEffect(() => {
     const fetchPatientData = async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}patients/cancer_samples/${patient.id}/`
-      );
-      const data = await response.json();
-      setSamplesData(data);
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}patients/cancer_samples/${
+            patient.id
+          }/`
+        );
+        setSamplesData(response.data);
+      } catch (error) {
+        navigate("/error", {
+          state: { status: error.response.status, message: error.message },
+        });
+      }
     };
 
     fetchPatientData();
   }, []);
 
   const handleKnnClick = async (sample) => {
-    // const new_sample_data = {
-    //   age: 45,
-    //   sex: "M",
-    //   stage: "II",
-    //   benign_sample_diagnosis: "Abdominal Pain",
-    //   plasma_CA19_9: 37.0,
-    //   creatinine: 0.9,
-    //   LYVE1: 1.2,
-    //   REG1B: 0.8,
-    //   TFF1: 1.1,
-    //   REG1A: 0.7,
-    // };
-    const markers = JSON.parse(sample.markers_JSON);
+    try {
+      const markers = JSON.parse(sample.markers_JSON);
 
-    const patientData = {
-      age: patient.age, // assuming patient object has age and sex properties
-      sex: patient.sex ? "M" : "F",
-      stage: sample.stage,
-      benign_sample_diagnosis: sample.benign_sample_diagnosis,
-      ...markers,
-    };
+      const patientData = {
+        sample_id: sample.id,
+        patient_id: patient.id,
+        age: patient.age,
+        sex: patient.sex ? "M" : "F",
+        stage: sample.stage,
+        benign_sample_diagnosis: sample.benign_sample_diagnosis,
+        ...markers,
+      };
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}classify/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(patientData),
-    });
+      // const response = await axios.post(
+      //   `${import.meta.env.VITE_API_URL}classify/`,
+      //   patientData
+      // );
 
-    const data = await response.json();
-    console.log(data);
+      // const data = response.data;
+
+      // sample.diagnosis = data[0];
+      // sample.stage = data[0];
+
+      const updateResponse = await axios.put(
+        `${import.meta.env.VITE_API_URL}patients/cancer_samples/update/${
+          sample.id
+        }/`,
+        sample
+      );
+
+      setSamplesData(
+        samplesData.map((item) => (item.id === sample.id ? sample : item))
+      );
+      navigate(`/patients/${patient.id}/results`, { state: { sample } });
+    } catch (error) {
+      navigate("/error", {
+        state: { status: error.response.status, message: error.message },
+      });
+    }
   };
 
   const handleDialogOpen = () => {
@@ -141,26 +160,28 @@ function PatientPage() {
       markers_JSON: JSON.stringify(markers),
     };
 
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}patients/cancer_samples/add/${
-        patient.id
-      }/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSend),
-      }
-    );
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}patients/cancer_samples/add/${
+          patient.id
+        }/`,
+        dataToSend
+      );
 
-    if (response.ok) {
-      const new_sample = await response.json();
-      setSamplesData([...samplesData, new_sample]);
-    } else {
-      console.error("Failed to add sample");
+      if (response.status === 201) {
+        const new_sample = response.data;
+        setSamplesData([...samplesData, new_sample]);
+        handleDialogClose();
+      } else {
+        navigate("/error", {
+          state: { status: error.response.status, message: error.message },
+        });
+      }
+    } catch (error) {
+      navigate("/error", {
+        state: { status: error.response.status, message: error.message },
+      });
     }
-    handleDialogClose();
   };
 
   return (
@@ -173,11 +194,11 @@ function PatientPage() {
         <DialogContent>
           <TextField
             margin="dense"
-            name="stage"
-            label="Stage"
+            name="organ_type"
+            label="Organ Type"
             type="text"
             fullWidth
-            value={newSampleData.stage}
+            value={newSampleData.organ_type}
             onChange={handleInputChange}
           />
           <TextField
@@ -269,35 +290,59 @@ function PatientPage() {
         </Grid>
       </Grid>
 
-      {samplesData.map((sample) => (
-        <Sample key={sample.id}>
-          <Card>
-            <CardContent>
-              <Typography variant="body2">Stage: {sample.stage}</Typography>
-              <Typography variant="body2">
-                Benign Sample Diagnosis {sample.benign_sample_diagnosis}
-              </Typography>
-              <Typography variant="body2">
-                Sample Markers: {sample.markers_JSON}
-              </Typography>
-            </CardContent>
-          </Card>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleKnnClick(sample)}
-          >
-            Generate KNN Output
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => handleDeleteClick(sample.id)}
-          >
-            Delete Sample
-          </Button>
-        </Sample>
-      ))}
+      {samplesData
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .map((sample) => (
+          <Sample key={sample.id}>
+            <Card>
+              <CardContent>
+                <Typography variant="body-2" style={{ display: "block" }}>
+                  Organ Type: {sample.organ_type}
+                </Typography>
+                <Typography variant="body-2" style={{ display: "block" }}>
+                  Diagnosis: {sample.diagnosis}
+                </Typography>
+                <Typography variant="body2" style={{ display: "block" }}>
+                  Stage: {sample.stage}
+                </Typography>
+                <Typography variant="body2">
+                  Benign Sample Diagnosis {sample.benign_sample_diagnosis}
+                </Typography>
+                <Typography variant="body2">
+                  {JSON.parse(sample.markers_JSON) &&
+                    Object.values(JSON.parse(sample.markers_JSON)).some(
+                      (value) => value
+                    ) && (
+                      <>
+                        Markers:{" "}
+                        {Object.entries(JSON.parse(sample.markers_JSON)).map(
+                          ([key, value]) =>
+                            value && <div key={key}>{`${key}: ${value}`}</div>
+                        )}
+                      </>
+                    )}
+                </Typography>
+                <Typography variant="body2">
+                  Timestamp: {new Date(sample.timestamp).toLocaleString()}
+                </Typography>
+              </CardContent>
+            </Card>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleKnnClick(sample)}
+            >
+              Generate KNN Output
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => handleDeleteClick(sample.id)}
+            >
+              Delete Sample
+            </Button>
+          </Sample>
+        ))}
     </Container>
   );
 }
