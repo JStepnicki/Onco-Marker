@@ -1,7 +1,33 @@
 .register-container {
-  min-height: 50vh;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -200px;
 }
 
+
 .register-form {
-  width: 300px;
+  max-width: 400px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.register-form .MuiTextField-root {
+  margin-bottom: 20px;
+}
+
+.register-form .MuiButton-root {
+  margin-top: 20px;
+}
+
+.register-form .MuiLink-root {
+  cursor: pointer;
+  color: #1976d2;
+}
+
+.register-form .MuiLink-root:hover {
+  text-decoration: underline;
 }
