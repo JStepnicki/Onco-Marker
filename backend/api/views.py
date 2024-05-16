@@ -1,3 +1,4 @@
+from email.message import EmailMessage
 import json
 
 from django.shortcuts import get_object_or_404
@@ -8,6 +9,7 @@ from django.http import JsonResponse
 from django.contrib.auth import get_user_model, authenticate, login
 from api.models import Doctor, Patient, CancerSample
 from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSerializer
+from django.conf import settings
 from knn.pancreatic_cancer_model import classify_sample
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import PasswordResetForm
@@ -101,6 +103,13 @@ def cancer_sample_list(request):
 
 @api_view(['POST'])
 def classify(request):
+    subject = "Your Medical Test Results"
+    message = f"Dear Patient,\n\nYour medical test results are now available."
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = ['wojteckiz8630@gmail.com']
+    
+    send_mail(subject, message, email_from, recipient_list, fail_silently=False)
+
     try:
         data = json.loads(request.body)
         if data is None:
