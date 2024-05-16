@@ -19,7 +19,8 @@ urlpatterns = [
     path('add_doctor/', add_doctor),
     path('register/', register, name='register'),
     path('login/', user_login, name='login'),
+    path('logout/', user_logout, name='logout'),
+    path('user/', get_user, name='user'),
     path('reset_password/', reset_password, name='reset_password'),
     path('patient/results/<uuid:access_token>/', patient_results, name='patient_results'),
-    
 ]
