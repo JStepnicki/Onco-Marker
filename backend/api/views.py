@@ -37,6 +37,15 @@ def add_doctor(request):
 @api_view(['GET'])
 def patient_list(request):
     if request.method == 'GET':
+        
+        access_token = request.query_params.get('access_token')
+
+        if access_token:
+            patient = get_object_or_404(Patient, access_token=access_token)
+            serializer = PatientSerializer(patient)
+            return Response(serializer.data)
+        
+        
         patients = Patient.objects.all()
         serializer = PatientSerializer(patients, many=True)
         return Response(serializer.data)
@@ -103,18 +112,36 @@ def cancer_sample_list(request):
 
 @api_view(['POST'])
 def classify(request):
+    data = json.loads(request.body)
+    print(data)
+    # get patiend access token fro mdb 
+    patient = Patient.objects.get(pk=data['patient_id'])
+    sample_id = data['sample_id']
+    access_token = patient.access_token
+    
     subject = "Your Medical Test Results"
-    message = f"Dear Patient,\n\nYour medical test results are now available."
+    message = f"Dear Patient,\n\nYour medical test results are now available. Please click the following link to view your results: http://localhost:5173/patients/{patient.id}/results/{sample_id}/{access_token}"
     email_from = settings.EMAIL_HOST_USER
     recipient_list = ['wojteckiz8630@gmail.com']
-    
-    send_mail(subject, message, email_from, recipient_list, fail_silently=False)
 
+    send_mail(subject, message, email_from, recipient_list, fail_silently=False)
     try:
         data = json.loads(request.body)
         if data is None:
             return Response({"error": "data not provided"}, status=400)
         result = classify_sample(data)
+        
+        # get patiend access token fro mdb 
+        # patient = Patient.objects.get(pk=data['patient_id'])
+        # sample_id = data['sample_id']
+        # access_token = patient.access_token
+        
+        # subject = "Your Medical Test Results"
+        # message = f"Dear Patient,\n\nYour medical test results are now available. Please click the following link to view your results: http://localhost:5173/patients/{patient.id}/results/{sample_id}/{access_token}"
+        # email_from = settings.EMAIL_HOST_USER
+        # recipient_list = ['wojteckiz8630@gmail.com']
+    
+        # send_mail(subject, message, email_from, recipient_list, fail_silently=False)
         
         return Response(result)
     except json.JSONDecodeError:
