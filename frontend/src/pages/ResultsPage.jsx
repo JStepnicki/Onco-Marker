@@ -1,79 +1,83 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Typography, Card, CardContent } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
 function ResultsPage() {
+  const navigate = useNavigate();
   const location = useLocation();
   const [patient, setPatient] = useState([]);
-  var sample = null;
+  const [sample, setSample] = useState({});
 
-  if (location.state?.sample) {
-      sample = location.state.sample;
-  } else {
-    console.log("No sample data found in location state");
-    const urlParts = window.location.pathname.split("/");
-    const accessToken = urlParts[urlParts.length - 1];
-    const sampleId = urlParts[urlParts.length - 3];
-    const fetchPatient = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}patients/`,
-          {
-            params: {
-              access_token: accessToken, // Pass the access token as a query parameter
-            },
-          }
-        );
-
-        if (response.data.length === 0) {
-          navigate("/error", {
-            state: { status: 404, message: "Patient not found" },
-          });
-        } else {
-          setPatient(response.data);
-          try {
-            const response = await axios.get(
-              `${import.meta.env.VITE_API_URL}patients/cancer_samples/`,
-              {
-                params: {
-                  sample_id: sampleId,
-                },
-              }
-            );
-            sample = response.data;
-          } catch (error) {
-            navigate("/error", {
-              state: {
-                status: error.response?.status || 500,
-                message: error.message,
+  useEffect(() => {
+    if (location.state?.sample) {
+      setSample(location.state.sample);
+    } else {
+      console.log("No sample data found in location state");
+      const urlParts = window.location.pathname.split("/");
+      const accessToken = urlParts[urlParts.length - 1];
+      const sampleId = urlParts[urlParts.length - 2];
+      const fetchPatient = async () => {
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_API_URL}patients/`,
+            {
+              params: {
+                access_token: accessToken,
               },
+            }
+          );
+
+          if (response.data.length === 0) {
+            navigate("/error", {
+              state: { status: 404, message: "Patient not found" },
             });
+          } else {
+            setPatient(response.data);
+            try {
+              const response = await axios.get(
+                `${import.meta.env.VITE_API_URL}cancer_samples/`,
+                {
+                  params: {
+                    sample_id: sampleId,
+                  },
+                }
+              );
+              setSample(response.data);
+            } catch (error) {
+              navigate("/error", {
+                state: {
+                  status: error.response?.status || 500,
+                  message: error.message,
+                },
+              });
+            }
           }
+        } catch (error) {
+          navigate("/error", {
+            state: {
+              status: error.response?.status || 500,
+              message: error.message,
+            },
+          });
         }
-      } catch (error) {
-        navigate("/error", {
-          state: {
-            status: error.response?.status || 500,
-            message: error.message,
-          },
-        });
-      }
-    };
+      };
 
-    fetchPatient();
-  }
+      fetchPatient();
+    }
+  }, []); 
 
+  console.log(sample);
   let diagnosis = "";
   switch (sample.diagnosis) {
-    case 1:
+    case "1":
       diagnosis = "Patient does not have cancer.";
       break;
-    case 2:
+    case "2":
       diagnosis = "Patient probably has cancer.";
       break;
-    case 3:
+    case "3":
       diagnosis = "Patient has cancer.";
       break;
     default:

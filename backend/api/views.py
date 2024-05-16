@@ -1,6 +1,7 @@
 from email.message import EmailMessage
 import json
 
+from rest_framework.exceptions import NotFound
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -105,8 +106,16 @@ def update_cancer_sample(request, pk):
 @api_view(['GET'])
 def cancer_sample_list(request):
     if request.method == 'GET':
-        cancer_samples = CancerSample.objects.all()
-        serializer = CancerSampleSerializer(cancer_samples, many=True)
+        sample_id = request.query_params.get('sample_id')
+        if sample_id is not None:
+            try:
+                cancer_sample = CancerSample.objects.get(id=sample_id)
+            except CancerSample.DoesNotExist:
+                raise NotFound('A cancer sample with this ID does not exist.')
+            serializer = CancerSampleSerializer(cancer_sample)
+        else:
+            cancer_samples = CancerSample.objects.all()
+            serializer = CancerSampleSerializer(cancer_samples, many=True)
         return Response(serializer.data)
     
 
