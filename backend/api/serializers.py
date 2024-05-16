@@ -1,3 +1,4 @@
+from django.forms import UUIDField
 from rest_framework.serializers import ModelSerializer
 from django.contrib.auth.models import User
 
@@ -34,3 +35,5 @@ class CancerSampleSerializer(ModelSerializer):
     class Meta:
         model = CancerSample
         fields = ('id', 'patient', 'stage', 'benign_sample_diagnosis' ,'markers_JSON', 'timestamp', 'diagnosis', 'organ_type')
+
+

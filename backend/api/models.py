@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 
 from django.contrib.auth.models import User
@@ -9,7 +10,7 @@ class Patient(models.Model):
     email = models.EmailField()
     age = models.IntegerField()
     sex = models.BooleanField()
-
+    access_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
 
     
@@ -36,3 +37,5 @@ class CancerSample(models.Model):
     def get_markers(self):
         return self.markers_JSON
     
+
+
