@@ -1,5 +1,7 @@
+from email.message import EmailMessage
 import json
 
+from rest_framework.exceptions import NotFound
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -8,6 +10,7 @@ from django.http import JsonResponse
 from django.contrib.auth import get_user_model, authenticate, login
 from api.models import Doctor, Patient, CancerSample
 from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSerializer
+from django.conf import settings
 from knn.pancreatic_cancer_model import classify_sample
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import PasswordResetForm
@@ -35,6 +38,15 @@ def add_doctor(request):
 @api_view(['GET'])
 def patient_list(request):
     if request.method == 'GET':
+        
+        access_token = request.query_params.get('access_token')
+
+        if access_token:
+            patient = get_object_or_404(Patient, access_token=access_token)
+            serializer = PatientSerializer(patient)
+            return Response(serializer.data)
+        
+        
         patients = Patient.objects.all()
         serializer = PatientSerializer(patients, many=True)
         return Response(serializer.data)
@@ -94,18 +106,51 @@ def update_cancer_sample(request, pk):
 @api_view(['GET'])
 def cancer_sample_list(request):
     if request.method == 'GET':
-        cancer_samples = CancerSample.objects.all()
-        serializer = CancerSampleSerializer(cancer_samples, many=True)
+        sample_id = request.query_params.get('sample_id')
+        if sample_id is not None:
+            try:
+                cancer_sample = CancerSample.objects.get(id=sample_id)
+            except CancerSample.DoesNotExist:
+                raise NotFound('A cancer sample with this ID does not exist.')
+            serializer = CancerSampleSerializer(cancer_sample)
+        else:
+            cancer_samples = CancerSample.objects.all()
+            serializer = CancerSampleSerializer(cancer_samples, many=True)
         return Response(serializer.data)
     
 
 @api_view(['POST'])
 def classify(request):
+    data = json.loads(request.body)
+    print(data)
+    # get patiend access token fro mdb 
+    patient = Patient.objects.get(pk=data['patient_id'])
+    sample_id = data['sample_id']
+    access_token = patient.access_token
+    
+    subject = "Your Medical Test Results"
+    message = f"Dear Patient,\n\nYour medical test results are now available. Please click the following link to view your results: http://localhost:5173/patients/{patient.id}/results/{sample_id}/{access_token}"
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = ['wojteckiz8630@gmail.com']
+
+    send_mail(subject, message, email_from, recipient_list, fail_silently=False)
     try:
         data = json.loads(request.body)
         if data is None:
             return Response({"error": "data not provided"}, status=400)
         result = classify_sample(data)
+        
+        # get patiend access token fro mdb 
+        # patient = Patient.objects.get(pk=data['patient_id'])
+        # sample_id = data['sample_id']
+        # access_token = patient.access_token
+        
+        # subject = "Your Medical Test Results"
+        # message = f"Dear Patient,\n\nYour medical test results are now available. Please click the following link to view your results: http://localhost:5173/patients/{patient.id}/results/{sample_id}/{access_token}"
+        # email_from = settings.EMAIL_HOST_USER
+        # recipient_list = ['wojteckiz8630@gmail.com']
+    
+        # send_mail(subject, message, email_from, recipient_list, fail_silently=False)
         
         return Response(result)
     except json.JSONDecodeError:
