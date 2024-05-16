@@ -2,11 +2,12 @@ import json
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_200_OK
 from rest_framework.viewsets import ModelViewSet
 from django.http import JsonResponse
-from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from api.models import Doctor, Patient, CancerSample
-from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSerializer
+from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSerializer, UserSerializer, UserRegisterSerializer, UserLoginSerializer
 from knn.pancreatic_cancer_model import classify_sample
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import PasswordResetForm
@@ -137,41 +138,33 @@ def delete_cancer_sample(request, pk):
 
 @api_view(['POST'])
 def register(request):
-    email = request.data.get('email')
-    password = request.data.get('password')
-    username = request.data.get('username')
-
-    if get_user_model().objects.filter(email=email).exists():
-        return JsonResponse({'error': 'Użytkownik o podanym adresie email już istnieje'}, status=400)
-    user = get_user_model().objects.create_user(username=username, email=email, password=password)
-    return JsonResponse({'message': 'Rejestracja zakończona pomyślnie'})
+    data = request.data
+    serializer = UserRegisterSerializer(data=data)
+    if serializer.is_valid(raise_exception=True):
+        user = serializer.create(data)
+        if user:
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(status=HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def user_login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-
-    user = authenticate(request, username=username, password=password)
-    print(user)
-    if user is not None:
-        login(request, user)
-        return JsonResponse({'message': 'Zalogowano pomyślnie'})
-    else:
-        return JsonResponse({'error': 'Nieprawidłowy email lub hasło'}, status=400)
+    data = request.data
+    serializer = UserLoginSerializer(data=data)
+    if serializer.is_valid(raise_exception=True):
+        user = serializer.validate(data)
+        if user:
+            login(request, user)
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(status=HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-def reset_password(request):
-    email = request.data.get('email')
-    form = PasswordResetForm({'email': email})
+def user_logout(request):
+    logout(request)
+    return Response(status=HTTP_200_OK)
 
-    if form.is_valid():
-        form.save(
-            request=request,
-            use_https=request.is_secure(),
-            token_generator=default_token_generator,
-            from_email=None,
-            email_template_name='registration/password_reset_email.html',
-        )
-        return JsonResponse({'message': 'Email resetujący hasło został wysłany. Sprawdź swoją skrzynkę odbiorczą.'})
-    else:
-        return JsonResponse({'error': 'Nieprawidłowy adres email'}, status=400)
+@api_view(['GET'])
+def get_user(request):
+    if request.user.is_authenticated:
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data, status=HTTP_200_OK)
+    return Response(status=HTTP_401_UNAUTHORIZED)

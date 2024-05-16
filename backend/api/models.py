@@ -1,6 +1,7 @@
 from django.db import models
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
+from django.contrib.auth.base_user import BaseUserManager
 
 
 class Patient(models.Model):
@@ -9,11 +10,6 @@ class Patient(models.Model):
     email = models.EmailField()
     age = models.IntegerField()
     sex = models.BooleanField()
-
-
-
-    
-
 
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -33,4 +29,25 @@ class CancerSample(models.Model):
 
     def get_markers(self):
         return self.markers_JSON
-    
+
+class AppUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        if not password:
+            raise ValueError('The Password field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        if not password:
+            raise ValueError('The Password field must be set')
+        user = self.create_user(email, password)
+        user.is_superuser = True
+        user.save()
+        return user
