@@ -1,5 +1,6 @@
 import json
 
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -10,6 +11,8 @@ from api.serializers import DoctorSerializer, PatientSerializer, CancerSampleSer
 from knn.pancreatic_cancer_model import classify_sample
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import PasswordResetForm
+from django.core.mail import send_mail
+from django.urls import reverse
 # such request to create a doctor, name and surname are optional
 # {
 #     "user": {
@@ -103,6 +106,7 @@ def classify(request):
         if data is None:
             return Response({"error": "data not provided"}, status=400)
         result = classify_sample(data)
+        
         return Response(result)
     except json.JSONDecodeError:
         return Response({"error": "Invalid JSON"}, status=400)
@@ -160,9 +164,9 @@ def register(request):
     username = request.data.get('username')
 
     if get_user_model().objects.filter(email=email).exists():
-        return JsonResponse({'error': 'Użytkownik o podanym adresie email już istnieje'}, status=400)
+        return JsonResponse({'error': 'User with provided email already exists'}, status=400)
     user = get_user_model().objects.create_user(username=username, email=email, password=password)
-    return JsonResponse({'message': 'Rejestracja zakończona pomyślnie'})
+    return JsonResponse({'message': 'Registration successful'})
 
 @api_view(['POST'])
 def user_login(request):
@@ -173,9 +177,9 @@ def user_login(request):
     print(user)
     if user is not None:
         login(request, user)
-        return JsonResponse({'message': 'Zalogowano pomyślnie'})
+        return JsonResponse({'message': 'Login successful'})
     else:
-        return JsonResponse({'error': 'Nieprawidłowy email lub hasło'}, status=400)
+        return JsonResponse({'error': 'Invalid email or password'}, status=400)
 
 @api_view(['POST'])
 def reset_password(request):
@@ -190,6 +194,24 @@ def reset_password(request):
             from_email=None,
             email_template_name='registration/password_reset_email.html',
         )
-        return JsonResponse({'message': 'Email resetujący hasło został wysłany. Sprawdź swoją skrzynkę odbiorczą.'})
+        return JsonResponse({'message': 'Password reset email has been sent. Please check your inbox.'})
     else:
-        return JsonResponse({'error': 'Nieprawidłowy adres email'}, status=400)
+        return JsonResponse({'error': 'Invalid email address'}, status=400)
+    
+    
+@api_view(['GET'])
+def patient_results(request, access_token):
+    if request.method == 'GET':
+        # Retrieve the patient using the access token
+        patient = get_object_or_404(Patient, access_token=access_token)
+        
+        # Query the patient's cancer samples
+        cancer_samples = patient.cancersample_set.all()
+        
+        # Serialize the data
+        serializer = CancerSampleSerializer(cancer_samples, many=True)
+        
+        # Return the serialized data
+        return Response(serializer.data)
+
+

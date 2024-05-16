@@ -20,5 +20,6 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('login/', user_login, name='login'),
     path('reset_password/', reset_password, name='reset_password'),
+    path('patient/results/<uuid:access_token>/', patient_results, name='patient_results'),
     
 ]
