@@ -1,3 +1,25 @@
-    .login-form {
-    width: 300px;
-  }
+.login-form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.login-form .MuiTextField-root {
+  margin-bottom: 20px;
+}
+
+.login-form .MuiButton-root {
+  margin-top: 20px;
+}
+
+.login-form .MuiLink-root {
+  cursor: pointer;
+  color: #1976d2;
+}
+
+.login-form .MuiLink-root:hover {
+  text-decoration: underline;
+}
