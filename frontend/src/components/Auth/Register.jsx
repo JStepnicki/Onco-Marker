@@ -25,10 +25,27 @@ function Register() {
         const data = await response.json();
         throw new Error(data.error || 'Something went wrong');
       }
-
-      navigate('/');
     } catch (error) {
       setError(error.message);
+    }
+    try {
+      const response = await fetch('http://localhost:8000/api/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid username or password');
+      }
+      sessionStorage.setItem('username', username);
+      navigate('/doctors');
+    }
+    catch (error) {
+      console.error('Error signing in:', error);
+      alert(error.message || 'Failed to sign in. Check your username and password.');
     }
   };
 

@@ -21,13 +21,13 @@ function Login() {
       });
 
       if (!response.ok) {
-        throw new Error('Invalid email or password');
+        throw new Error('Invalid username or password');
       }
-
+      sessionStorage.setItem('username', username);
       navigate('/doctors');
     } catch (error) {
       console.error('Error signing in:', error);
-      // Handle login errors
+        alert(error.message || 'Failed to sign in. Check your username and password.');
     }
   };
 

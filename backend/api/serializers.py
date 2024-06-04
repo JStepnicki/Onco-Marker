@@ -41,7 +41,7 @@ class CancerSampleSerializer(ModelSerializer):
 class UserRegisterSerializer(ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ('email', 'password')
+        fields = ('email','username', 'password')
 
     def create(self, validated_data):
         user = UserModel.objects.create_user(email=validated_data['email'], password=validated_data['password'], username=validated_data['username'])
@@ -59,4 +59,6 @@ class UserLoginSerializer(ModelSerializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError("Incorrect Credentials")
+
+
 
