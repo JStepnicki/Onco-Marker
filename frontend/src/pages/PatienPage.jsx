@@ -99,15 +99,15 @@ function PatientPage() {
         ...markers,
       };
 
-      // const response = await axios.post(
-      //   `${import.meta.env.VITE_API_URL}classify/`,
-      //   patientData
-      // );
+       const response = await axios.post(
+         `${import.meta.env.VITE_API_URL}classify/`,
+         patientData
+       );
 
-      // const data = response.data;
+      const data = response.data;
 
-      // sample.diagnosis = data[0];
-      // sample.stage = data[0];
+       sample.diagnosis = data[0];
+       sample.stage = data[0];
 
       const updateResponse = await axios.put(
         `${import.meta.env.VITE_API_URL}patients/cancer_samples/update/${
