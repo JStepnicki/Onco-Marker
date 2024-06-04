@@ -34,12 +34,14 @@ function PatientList() {
   const memoizedSetSearch = useCallback((newSearch) => {
     setSearch(newSearch);
   }, []);
-
   useEffect(() => {
     const fetchPatients = async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}patients/`);
-      const data = await response.json();
-      setPatients(data);
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}patients/`);
+        setPatients(response.data);
+      } catch (error) {
+        navigate('/error', { state: { status: error.response.status, message: error.message } });
+      }
     };
 
     fetchPatients();
@@ -58,16 +60,24 @@ function PatientList() {
   };
 
   const addPatient = async (patientData) => {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}patients/add/`,
-      patientData
-    );
-    setPatients([...patients, response.data]);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}patients/add/`,
+        patientData
+      );
+      setPatients([...patients, response.data]);
+    } catch (error) {
+      navigate('/error', { state: { status: error.response.status, message: "Internal Server Error."} });
+    }
   };
 
   const deletePatient = async (patientId) => {
-    await axios.delete(`${import.meta.env.VITE_API_URL}patients/${patientId}/delete/`);
-    setPatients(patients.filter((patient) => patient.id !== patientId));
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}patients/${patientId}/delete/`);
+      setPatients(patients.filter((patient) => patient.id !== patientId));
+    } catch (error) {
+      navigate('/error', { state: { status: error.response.status, message: error.message } });
+    }
   };
 
   const updatePatient = async (patientId, updatedData) => {
@@ -86,7 +96,7 @@ function PatientList() {
         console.error(`Failed to update patient: ${response.status}`);
       }
     } catch (error) {
-      console.error(`Failed to update patient: ${error}`);
+      navigate('/error', { state: { status: error.response.status, message: error.message } });
     }
   };
 
@@ -114,6 +124,7 @@ function PatientList() {
           <TableHead>
             <TableRow>
               <TableCell>Name and Surname</TableCell>
+              <TableCell align="right">Email</TableCell>
               <TableCell align="right">Age</TableCell>
               <TableCell align="right">Gender</TableCell>
               <TableCell align="right">Actions</TableCell>
@@ -123,6 +134,7 @@ function PatientList() {
             {displayedPatients.map((patient) => (
               <TableRow key={patient.id}>
                 <TableCell>{patient.name} {patient.surname}</TableCell>
+                <TableCell align="right">{patient.email}</TableCell>
                 <TableCell align="right">{patient.age}</TableCell>
                 <TableCell align="right">{patient.sex == true ? 'Male' : 'Female'}</TableCell>
                 <TableCell align="right">

@@ -16,7 +16,7 @@ function MainPage() {
   return (
     <div className="main-page">
       <Typography variant="h4" component="h1" gutterBottom>
-        Main Page
+        Log in
       </Typography>
       <Login />
       <Typography variant="subtitle2">

@@ -1,8 +1,24 @@
-import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 import { useState, useEffect } from "react";
 
 function EditDialog({ open, handleClose, patient, updatePatient }) {
-  const [editForm, setEditForm] = useState({ name: "", surname: "", age: "", sex: "" });
+  const [editForm, setEditForm] = useState({
+    name: "",
+    surname: "",
+    age: "",
+    sex: "",
+  });
 
   useEffect(() => {
     setEditForm(patient);
@@ -33,6 +49,14 @@ function EditDialog({ open, handleClose, patient, updatePatient }) {
           name="surname"
           label="Surname"
           value={editForm?.surname}
+          onChange={handleInputChange}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          name="email"
+          label="email"
+          value={editForm?.email}
           onChange={handleInputChange}
           fullWidth
           margin="normal"
