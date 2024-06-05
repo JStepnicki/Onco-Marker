@@ -6,7 +6,8 @@ function DoctorPage() {
     const username = sessionStorage.getItem('username');
     if (!username) {
         alert('You must be logged in to view this page');
-        window.location.href = '/login';
+        window.location.href = '/';
+        return null;
     }
   return (
     <div className="doctor-page">
