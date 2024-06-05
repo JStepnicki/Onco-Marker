@@ -23,4 +23,5 @@ urlpatterns = [
     path('user/', get_user, name='user'),
     path('reset_password/', reset_password, name='reset_password'),
     path('patient/results/<uuid:access_token>/', patient_results, name='patient_results'),
+    path('all_results/', get_all_cancer_samples, name='all_results'),
 ]
