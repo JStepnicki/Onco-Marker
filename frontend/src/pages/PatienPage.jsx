@@ -1,4 +1,3 @@
-import ResultsPage from "./ResultsPage";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -39,7 +38,7 @@ function PatientPage() {
   const [samplesData, setSamplesData] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newSampleData, setNewSampleData] = useState({
-    benign_sample_diagnosis: "",
+    organ_type: "", // Dodaj pole organ_type
     plasma_CA19_9: "",
     creatinine: "",
     LYVE1: "",
@@ -96,18 +95,19 @@ function PatientPage() {
         sex: patient.sex ? "M" : "F",
         stage: sample.stage,
         benign_sample_diagnosis: sample.benign_sample_diagnosis,
+        organ_type: sample.organ_type,
         ...markers,
       };
 
-       const response = await axios.post(
-         `${import.meta.env.VITE_API_URL}classify/`,
-         patientData
-       );
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}classify/`,
+        patientData
+      );
 
       const data = response.data;
 
-       sample.diagnosis = data[0];
-       sample.stage = data[0];
+      sample.diagnosis = data[0];
+      sample.stage = data[0];
 
       const updateResponse = await axios.put(
         `${import.meta.env.VITE_API_URL}patients/cancer_samples/update/${
@@ -158,6 +158,7 @@ function PatientPage() {
     const dataToSend = {
       ...rest,
       markers_JSON: JSON.stringify(markers),
+      organ_type: newSampleData.organ_type, // Dodaj pole organ_type
     };
 
     try {
@@ -203,15 +204,6 @@ function PatientPage() {
           />
           <TextField
             margin="dense"
-            name="benign_sample_diagnosis"
-            label="Benign Sample Diagnosis"
-            type="text"
-            fullWidth
-            value={newSampleData.benign_sample_diagnosis}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
             name="plasma_CA19_9"
             label="Plasma CA19-9"
             type="number"
@@ -252,7 +244,7 @@ function PatientPage() {
             label="TFF1"
             type="number"
             fullWidth
-            value={newSampleData.TFF1}
+                        value={newSampleData.TFF1}
             onChange={handleInputChange}
           />
           <TextField

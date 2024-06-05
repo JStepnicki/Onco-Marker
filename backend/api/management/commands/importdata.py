@@ -1,12 +1,12 @@
 import csv
 from django.core.management.base import BaseCommand
-from api.models import CancerSample  # Adjust the import if your model is in a different app
+from api.models import CancerSample
 
 class Command(BaseCommand):
     help = 'Import data from CSV file into CancerSample model'
 
     def handle(self, *args, **kwargs):
-        file_path = 'knn/resources/pancreatic_cancer_dataset.csv'  # Replace with the actual path to your CSV file
+        file_path = 'knn/resources/pancreatic_cancer_dataset.csv'
 
         with open(file_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)

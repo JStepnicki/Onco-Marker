@@ -134,7 +134,6 @@ def classify(request):
 
 
 
-
     send_mail(subject, message, email_from, recipient_list, fail_silently=False)
     try:
         data = json.loads(request.body)

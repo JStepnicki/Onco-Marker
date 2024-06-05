@@ -14,8 +14,6 @@ class Patient(models.Model):
     access_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
 
-
-
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -59,4 +57,3 @@ class AppUserManager(BaseUserManager):
         user.is_superuser = True
         user.save()
         return user
-
