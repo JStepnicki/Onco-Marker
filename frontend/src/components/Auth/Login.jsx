@@ -14,9 +14,39 @@ function Login() {
             MuiInputLabel: {
                 styleOverrides: {
                     root: {
-                        fontSize: '1.2rem', // Increase font size of label
+                        fontSize: '1.2rem',
+                        fontWeight: 'bold',
                         '&:hover': {
-                            color: '#333', // Change color to #333 on hover
+                            color: '#333',
+                        },
+                        '&.Mui-focused': {
+                            color: '#333',
+                        },
+                    },
+                },
+            },
+            MuiOutlinedInput: {
+                styleOverrides: {
+                    root: {
+                        '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#333',
+                            borderWidth: '2px',
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#333',
+                            borderWidth: '2px',
+                        },
+                    },
+                },
+            },
+            MuiInputBase: {
+                styleOverrides: {
+                    input: {
+                        '&::placeholder': {
+                            color: '#333',
+                        },
+                        '&:focus::placeholder': {
+                            color: '#333',
                         },
                     },
                 },
