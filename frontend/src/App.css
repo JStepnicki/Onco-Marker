@@ -5,3 +5,12 @@
   height: 100vh;
   width: 100vw;
 }
+
+.app-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url('./assets/background.jpg'); /* Dodaj ścieżkę do swojego zdjęcia */
+  background-size: cover; /* Dopasuj rozmiar zdjęcia */
+  background-position: center; /* Wyśrodkuj zdjęcie */
+}
