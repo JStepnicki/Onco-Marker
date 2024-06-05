@@ -20,3 +20,8 @@
 .table-head-cell {
   font-weight: bold;
 }
+
+.icon {
+  cursor: pointer;
+  margin-right: 10px;
+}
