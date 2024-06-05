@@ -1,7 +1,7 @@
 import React from 'react';
 
 const ProfileIcon = ({ onClick }) => (
-    <svg onClick={onClick} width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg onClick={onClick} width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g clipPath="url(#clip0_15_82)">
             <rect width="24" height="24" fill="white"/>
             <g filter="url(#filter0_d_15_82)">
