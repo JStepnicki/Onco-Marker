@@ -23,3 +23,8 @@
 .register-form .MuiLink-root:hover {
   text-decoration: underline;
 }
+
+.register-form .MuiButton-root:hover {
+  background-color: #6A3D8A;
+}
+

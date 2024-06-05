@@ -19,10 +19,6 @@ function MainPage() {
 
     return (
         <div className="main-page">
-            <div className="background-image"></div> {/* Dodaj tło */}
-            <Typography variant="h4" component="h1" gutterBottom>
-                {isRegister ? 'Register' : 'Log in'}
-            </Typography>
             {isRegister ? <Register /> : <Login />}
             <Typography variant="subtitle2">
                 {isRegister ? 'Already have an account? ' : "Don't have an account? "}
