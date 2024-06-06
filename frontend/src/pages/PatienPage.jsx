@@ -24,12 +24,17 @@ import {
 import SampleDialog from "../components/Sample/SampleDialog.jsx";
 import {styled} from "@mui/system";
 
-const Container = styled("div")({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "20px",
+// const Container = styled("div")({
+//     display: "flex",
+//     flexDirection: "column",
+//     alignItems: "center",
+//     justifyContent: "center",
+//     gap: "20px",
+// });
+
+const StyledBox = styled(Box)({
+    flexGrow: 1,
+    margin: "16px",
 });
 
 const Sample = styled("div")({
@@ -93,7 +98,6 @@ function PatientPage() {
 
     const handleKnnClick = async (sample) => {
         try {
-            // Ensure markers_JSON is parsed correctly
             let markers;
             if (typeof sample.markers_JSON === 'string') {
                 try {
@@ -107,33 +111,27 @@ function PatientPage() {
                 throw new Error('markers_JSON is not a valid JSON format or object');
             }
 
-            // Prepare data to send to classification endpoint
             const classificationData = {
                 ...markers,
                 organ_type: sample.organ_type,
-                sample_id: sample.id, // Add sample_id to the classification data
-                patient_id: patient.id, // Add patient_id to the classification data
+                sample_id: sample.id,
+                patient_id: patient.id,
             };
 
-            // Send markers and organ_type to the classification endpoint
             const response = await axios.post(
                 `${import.meta.env.VITE_API_URL}classify/`,
                 classificationData
             );
 
             const data = response.data;
-
-            // Update the sample with the diagnosis and stage from the response
             sample.diagnosis = data[0];
             sample.stage = data[0];
 
 
-            // Update the local state with the modified sample
             setSamplesData(
                 samplesData.map((item) => (item.id === sample.id ? sample : item))
             );
 
-            // Navigate to the results page
             navigate(`/patients/${patient.id}/results`, {state: {sample}});
         } catch (error) {
             console.error("Error:", error); // Log the full error for debugging
@@ -204,30 +202,8 @@ function PatientPage() {
         }
     };
 
-    // const TopBar = ({patient, handleDialogOpen, page, setPage, totalItems}) => {
-    //     return (
-    //         <AppBar position="static">
-    //             <Toolbar>
-    //                 <Typography variant="h6" sx={{flexGrow: 1}}>
-    //                     {patient.name} {patient.surname} - Age: {patient.age} -
-    //                     Gender: {patient.sex ? "Male" : "Female"}
-    //                 </Typography>
-    //                 <Button color="inherit" onClick={handleDialogOpen}>
-    //                     Add New Sample
-    //                 </Button>
-    //                 <Pagination
-    //                     count={Math.ceil(totalItems / 6)}
-    //                     page={page}
-    //                     onChange={(_, value) => setPage(value)}
-    //                     sx={{color: '#fff'}}
-    //                 />
-    //             </Toolbar>
-    //         </AppBar>
-    //     );
-    // };
-
     return (
-        <Container>
+        <StyledBox>
             <TopBar
                 patient={patient}
                 handleDialogOpen={handleDialogOpen}
@@ -292,7 +268,7 @@ function PatientPage() {
                         </Grid>
                     ))}
             </Grid>
-        </Container>
+        </StyledBox>
     );
 }
 
