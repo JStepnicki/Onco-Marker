@@ -127,20 +127,20 @@ function Filter({search, setSearch, page, setPage, totalItems, addPatient}) {
                         sx={{
                             '& .MuiPaginationItem-root': {
                                 color: '#fff',
-                                backgroundColor: '#999', // Kolor tła innych stron
+                                backgroundColor: '#999',
                                 '&:hover': {
                                     backgroundColor: '#555',
                                     cursor: 'pointer'
                                 }
                             },
                             '& .MuiPaginationItem-page.Mui-selected': {
-                                backgroundColor: '#333', // Kolor tła wybranej strony
+                                backgroundColor: '#333',
                                 '&:hover': {
                                     backgroundColor: '#555',
                                 }
                             },
                             '& .MuiPaginationItem-ellipsis, & .MuiPaginationItem-previous.Mui-disabled, & .MuiPaginationItem-next.Mui-disabled': {
-                                color: '#999', // Kolor strzałek, które nie mogą być kliknięte
+                                color: '#999',
                             }
                         }}
                     />

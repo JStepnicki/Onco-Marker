@@ -34,6 +34,10 @@ function Register() {
                             borderColor: '#333',
                             borderWidth: '2px',
                         },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#000',
+                            borderWidth: '3px',
+                        },
                         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                             borderColor: '#333',
                             borderWidth: '2px',
