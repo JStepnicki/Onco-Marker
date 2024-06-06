@@ -10,7 +10,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background-image: linear-gradient(to left, #2F4F4F, rgba(47, 79, 79, 0)), url('assets/background.jpg');
+  background-image: linear-gradient(to left, #2F4F4F, rgba(47, 79, 79, 0)), url('assets/background_upscale.jpeg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

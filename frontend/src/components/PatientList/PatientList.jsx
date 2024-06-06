@@ -27,6 +27,17 @@ const StyledBox = styled(Box)({
     margin: "16px",
 });
 
+const StyledTableCell = styled(TableCell)({
+    fontWeight: 'bold',
+    color: '#555',
+});
+
+const StyledTableRow = styled(TableRow)({
+    '&:hover': {
+        backgroundColor: '#f5f5f5',
+    },
+});
+
 function PatientList() {
     const [patients, setPatients] = useState([]);
     const [displayedPatients, setDisplayedPatients] = useState([]);
@@ -57,7 +68,7 @@ function PatientList() {
         const filteredPatients = patients.filter((patient) =>
             (patient.name + ' ' + patient.surname).toLowerCase().includes(search.toLowerCase())
         );
-        setDisplayedPatients(filteredPatients.slice((page - 1) * 16, page * 16));
+        setDisplayedPatients(filteredPatients.slice((page - 1) * 7, page * 7));
     }, [patients, page, search]);
 
     const handleExamineSamples = (patientId) => {
@@ -78,7 +89,6 @@ function PatientList() {
     };
 
     const deletePatient = async (patientId) => {
-        console.log("XDDDDDDDD");
         try {
             await axios.delete(`${import.meta.env.VITE_API_URL}patients/${patientId}/delete/`);
             setPatients(patients.filter((patient) => patient.id !== patientId));
@@ -129,26 +139,26 @@ function PatientList() {
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
-                        <TableRow>
-                            <TableCell align="center">Gender</TableCell>
-                            <TableCell align="center">Name and Surname</TableCell>
-                            <TableCell align="center">Email</TableCell>
-                            <TableCell align="center">Age</TableCell>
-                            <TableCell align="center">Actions</TableCell>
-                        </TableRow>
+                        <StyledTableRow>
+                            <StyledTableCell align="center">Gender</StyledTableCell>
+                            <StyledTableCell align="center">Name and Surname</StyledTableCell>
+                            <StyledTableCell align="center">Email</StyledTableCell>
+                            <StyledTableCell align="center">Age</StyledTableCell>
+                            <StyledTableCell align="center">Actions</StyledTableCell>
+                        </StyledTableRow>
                     </TableHead>
                     <TableBody>
                         {displayedPatients.map((patient) => (
                             <TableRow key={patient.id}>
-                                <TableCell align="center">{patient.sex === true ? <ManIcon/> : <WomanIcon/>}</TableCell>
-                                <TableCell align="center">{patient.name} {patient.surname}</TableCell>
-                                <TableCell align="center">{patient.email}</TableCell>
-                                <TableCell align="center">{patient.age}</TableCell>
-                                <TableCell align="center">
-                                    <ProfileIcon onClick={() => handleExamineSamples(patient.id)}/>
-                                    <EditIcon onClick={() => handleOpen(patient)}/>
+                                <StyledTableCell align="center">{patient.sex === true ? <ManIcon/> : <WomanIcon/>}</StyledTableCell>
+                                <StyledTableCell align="center">{patient.name} {patient.surname}</StyledTableCell>
+                                <StyledTableCell align="center">{patient.email}</StyledTableCell>
+                                <StyledTableCell align="center">{patient.age}</StyledTableCell>
+                                <StyledTableCell align="center">
+                                    <ProfileIcon style={{ marginRight: '10px' }} onClick={() => handleExamineSamples(patient.id)}/>
+                                    <EditIcon style={{ marginRight: '10px' }} onClick={() => handleOpen(patient)}/>
                                     <DeleteIcon onClick={() => deletePatient(patient.id)}/>
-                                </TableCell>
+                                </StyledTableCell>
                             </TableRow>
                         ))}
                     </TableBody>
