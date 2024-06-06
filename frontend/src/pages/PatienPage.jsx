@@ -1,353 +1,299 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+import TopBar from "../components/Header/TopBar.jsx";
 import axios from "axios";
 import {
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  Paper,
-  Box,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Select,
-  MenuItem,
+    Typography,
+    Card,
+    CardContent,
+    Grid,
+    Paper,
+    Box,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Select,
+    MenuItem,
+    Pagination,
+    AppBar,
+    Toolbar,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import SampleDialog from "../components/Sample/SampleDialog.jsx";
+import {styled} from "@mui/system";
 
 const Container = styled("div")({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "20px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "20px",
 });
 
 const Sample = styled("div")({
-  border: "1px solid #ddd",
-  borderRadius: "5px",
-  padding: "10px",
-  width: "50%",
+    border: "1px solid #ddd",
+    borderRadius: "5px",
+    padding: "10px",
+    width: "50%",
 });
 
 function PatientPage() {
-  const [samplesData, setSamplesData] = useState([]);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [newSampleData, setNewSampleData] = useState({
-    organ_type: "", // Dodaj pole organ_type
-    plasma_CA19_9: "",
-    creatinine: "",
-    LYVE1: "",
-    REG1B: "",
-    TFF1: "",
-    REG1A: "",
-  });
-  const navigate = useNavigate();
-  const location = useLocation();
-  const patient = location.state.patient;
-
-  const handleDeleteClick = async (sampleId) => {
-    try {
-      const response = await axios.delete(
-        `${
-          import.meta.env.VITE_API_URL
-        }patients/cancer_samples/delete/${sampleId}/`
-      );
-      setSamplesData(samplesData.filter((sample) => sample.id !== sampleId));
-    } catch (error) {
-      navigate("/error", {
-        state: { status: error.response.status, message: error.message },
-      });
-    }
-  };
-
-  useEffect(() => {
-    const fetchPatientData = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}patients/cancer_samples/${
-            patient.id
-          }/`
-        );
-        setSamplesData(response.data);
-      } catch (error) {
-        navigate("/error", {
-          state: { status: error.response.status, message: error.message },
-        });
-      }
-    };
-
-    fetchPatientData();
-  }, []);
-
-const handleKnnClick = async (sample) => {
-  try {
-    // Ensure markers_JSON is parsed correctly
-    let markers;
-    if (typeof sample.markers_JSON === 'string') {
-      try {
-        markers = JSON.parse(sample.markers_JSON);
-      } catch (parseError) {
-        throw new Error(`Invalid JSON format in markers_JSON: ${parseError.message}`);
-      }
-    } else if (typeof sample.markers_JSON === 'object') {
-      markers = sample.markers_JSON;
-    } else {
-      throw new Error('markers_JSON is not a valid JSON format or object');
-    }
-
-    // Prepare data to send to classification endpoint
-    const classificationData = {
-      ...markers,
-      organ_type: sample.organ_type,
-      sample_id: sample.id, // Add sample_id to the classification data
-      patient_id: patient.id, // Add patient_id to the classification data
-    };
-
-    // Send markers and organ_type to the classification endpoint
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}classify/`,
-      classificationData
-    );
-
-    const data = response.data;
-
-    // Update the sample with the diagnosis and stage from the response
-    sample.diagnosis = data[0];
-    sample.stage = data[0];
-
-
-
-    // Update the local state with the modified sample
-    setSamplesData(
-      samplesData.map((item) => (item.id === sample.id ? sample : item))
-    );
-
-    // Navigate to the results page
-    navigate(`/patients/${patient.id}/results`, { state: { sample } });
-  } catch (error) {
-    console.error("Error:", error); // Log the full error for debugging
-    const status = error.response ? error.response.status : 500;
-    const message = error.message ? error.message : 'Something went wrong';
-    navigate("/error", {
-      state: { status, message },
+    const [samplesData, setSamplesData] = useState([]);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const itemsPerPage = 6;
+    const [newSampleData, setNewSampleData] = useState({
+        organ_type: "", // Dodaj pole organ_type
+        plasma_CA19_9: "",
+        creatinine: "",
+        LYVE1: "",
+        REG1B: "",
+        TFF1: "",
+        REG1A: "",
     });
-  }
-};
+    const navigate = useNavigate();
+    const location = useLocation();
+    const patient = location.state.patient;
 
-
-
-
-
-  const handleDialogOpen = () => {
-    setDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-  };
-
-  const handleInputChange = (event) => {
-    setNewSampleData({
-      ...newSampleData,
-      [event.target.name]: event.target.value,
-    });
-  };
-
-  const handleAddSampleClick = async () => {
-    const markers = {
-      plasma_CA19_9: newSampleData.plasma_CA19_9,
-      creatinine: newSampleData.creatinine,
-      LYVE1: newSampleData.LYVE1,
-      REG1B: newSampleData.REG1B,
-      TFF1: newSampleData.TFF1,
-      REG1A: newSampleData.REG1A,
+    const handleDeleteClick = async (sampleId) => {
+        try {
+            const response = await axios.delete(
+                `${
+                    import.meta.env.VITE_API_URL
+                }patients/cancer_samples/delete/${sampleId}/`
+            );
+            setSamplesData(samplesData.filter((sample) => sample.id !== sampleId));
+        } catch (error) {
+            navigate("/error", {
+                state: {status: error.response.status, message: error.message},
+            });
+        }
     };
 
-    const { plasma_CA19_9, creatinine, LYVE1, REG1B, TFF1, REG1A, ...rest } =
-      newSampleData;
+    useEffect(() => {
+        const fetchPatientData = async () => {
+            try {
+                const response = await axios.get(
+                    `${import.meta.env.VITE_API_URL}patients/cancer_samples/${
+                        patient.id
+                    }/`
+                );
+                setSamplesData(response.data);
+            } catch (error) {
+                navigate("/error", {
+                    state: {status: error.response.status, message: error.message},
+                });
+            }
+        };
 
-    const dataToSend = {
-      ...rest,
-      markers_JSON: markers,
-      organ_type: newSampleData.organ_type, // Dodaj pole organ_type
+        fetchPatientData();
+    }, []);
+
+    const handleKnnClick = async (sample) => {
+        try {
+            // Ensure markers_JSON is parsed correctly
+            let markers;
+            if (typeof sample.markers_JSON === 'string') {
+                try {
+                    markers = JSON.parse(sample.markers_JSON);
+                } catch (parseError) {
+                    throw new Error(`Invalid JSON format in markers_JSON: ${parseError.message}`);
+                }
+            } else if (typeof sample.markers_JSON === 'object') {
+                markers = sample.markers_JSON;
+            } else {
+                throw new Error('markers_JSON is not a valid JSON format or object');
+            }
+
+            // Prepare data to send to classification endpoint
+            const classificationData = {
+                ...markers,
+                organ_type: sample.organ_type,
+                sample_id: sample.id, // Add sample_id to the classification data
+                patient_id: patient.id, // Add patient_id to the classification data
+            };
+
+            // Send markers and organ_type to the classification endpoint
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}classify/`,
+                classificationData
+            );
+
+            const data = response.data;
+
+            // Update the sample with the diagnosis and stage from the response
+            sample.diagnosis = data[0];
+            sample.stage = data[0];
+
+
+            // Update the local state with the modified sample
+            setSamplesData(
+                samplesData.map((item) => (item.id === sample.id ? sample : item))
+            );
+
+            // Navigate to the results page
+            navigate(`/patients/${patient.id}/results`, {state: {sample}});
+        } catch (error) {
+            console.error("Error:", error); // Log the full error for debugging
+            const status = error.response ? error.response.status : 500;
+            const message = error.message ? error.message : 'Something went wrong';
+            navigate("/error", {
+                state: {status, message},
+            });
+        }
     };
 
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}patients/cancer_samples/add/${
-          patient.id
-        }/`,
-        dataToSend
-      );
 
-      if (response.status === 201) {
-        const new_sample = response.data;
-        setSamplesData([...samplesData, new_sample]);
-        handleDialogClose();
-      } else {
-        navigate("/error", {
-          state: { status: error.response.status, message: error.message },
+    const handleDialogOpen = () => {
+        setDialogOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+    };
+
+    const handleInputChange = (event) => {
+        setNewSampleData({
+            ...newSampleData,
+            [event.target.name]: event.target.value,
         });
-      }
-    } catch (error) {
-      navigate("/error", {
-        state: { status: error.response.status, message: error.message },
-      });
-    }
-  };
+    };
 
-  return (
-    <Container>
-      <Button variant="contained" color="primary" onClick={handleDialogOpen}>
-        Add New Sample
-      </Button>
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>Add New Sample</DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="dense"
-            name="organ_type"
-            label="Organ Type"
-            type="text"
-            fullWidth
-            value={newSampleData.organ_type}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="plasma_CA19_9"
-            label="Plasma CA19-9"
-            type="number"
-            fullWidth
-            value={newSampleData.plasma_CA19_9}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="creatinine"
-            label="Creatinine"
-            type="number"
-            fullWidth
-            value={newSampleData.creatinine}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="LYVE1"
-            label="LYVE1"
-            type="number"
-            fullWidth
-            value={newSampleData.LYVE1}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="REG1B"
-            label="REG1B"
-            type="number"
-            fullWidth
-            value={newSampleData.REG1B}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="TFF1"
-            label="TFF1"
-            type="number"
-            fullWidth
-                        value={newSampleData.TFF1}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="REG1A"
-            label="REG1A"
-            type="number"
-            fullWidth
-            value={newSampleData.REG1A}
-            onChange={handleInputChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleAddSampleClick} color="primary">
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Paper elevation={3}>
-            <Box textAlign="center">
-              <Typography variant="h6">
-                {patient.name} {patient.surname}
-              </Typography>
-              <Typography variant="body1">Age: {patient.age}</Typography>
-              <Typography variant="body1">
-                Gender: {patient.sex == true ? "Male" : "Female"}
-              </Typography>
-            </Box>
-          </Paper>
-        </Grid>
-      </Grid>
+    const handleAddSampleClick = async () => {
+        const markers = {
+            plasma_CA19_9: newSampleData.plasma_CA19_9,
+            creatinine: newSampleData.creatinine,
+            LYVE1: newSampleData.LYVE1,
+            REG1B: newSampleData.REG1B,
+            TFF1: newSampleData.TFF1,
+            REG1A: newSampleData.REG1A,
+        };
 
-     {samplesData
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        .map((sample) => (
-          <Sample key={sample.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="body-2">Sample ID: {sample.id}</Typography>
-                <Typography variant="body2">
-                  Stage: {sample.stage}
-                </Typography>
-                <Typography variant="body2">
-                  Benign Sample Diagnosis: {sample.benign_sample_diagnosis}
-                </Typography>
-                <Typography variant="body2">
-                  {sample.markers_JSON && (
-                    <>
-                      Markers:{" "}
-                      {Object.entries(
-                        typeof sample.markers_JSON === "string"
-                          ? JSON.parse(sample.markers_JSON)
-                          : sample.markers_JSON
-                      ).map(([key, value]) => (
-                        <div key={key}>{`${key}: ${value}`}</div>
-                      ))}
-                    </>
-                  )}
-                </Typography>
-                <Typography variant="body2">
-                  Timestamp: {new Date(sample.timestamp).toLocaleString()}
-                </Typography>
-              </CardContent>
-            </Card>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleKnnClick(sample)}
-            >
-              Generate KNN Output
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => handleDeleteClick(sample.id)}
-            >
-              Delete Sample
-            </Button>
-          </Sample>
-        ))}
-    </Container>
-  );
+        const {plasma_CA19_9, creatinine, LYVE1, REG1B, TFF1, REG1A, ...rest} =
+            newSampleData;
+
+        const dataToSend = {
+            ...rest,
+            markers_JSON: markers,
+            organ_type: newSampleData.organ_type, // Dodaj pole organ_type
+        };
+
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}patients/cancer_samples/add/${
+                    patient.id
+                }/`,
+                dataToSend
+            );
+
+            if (response.status === 201) {
+                const new_sample = response.data;
+                setSamplesData([...samplesData, new_sample]);
+                handleDialogClose();
+            } else {
+                navigate("/error", {
+                    state: {status: error.response.status, message: error.message},
+                });
+            }
+        } catch (error) {
+            navigate("/error", {
+                state: {status: error.response.status, message: error.message},
+            });
+        }
+    };
+
+    // const TopBar = ({patient, handleDialogOpen, page, setPage, totalItems}) => {
+    //     return (
+    //         <AppBar position="static">
+    //             <Toolbar>
+    //                 <Typography variant="h6" sx={{flexGrow: 1}}>
+    //                     {patient.name} {patient.surname} - Age: {patient.age} -
+    //                     Gender: {patient.sex ? "Male" : "Female"}
+    //                 </Typography>
+    //                 <Button color="inherit" onClick={handleDialogOpen}>
+    //                     Add New Sample
+    //                 </Button>
+    //                 <Pagination
+    //                     count={Math.ceil(totalItems / 6)}
+    //                     page={page}
+    //                     onChange={(_, value) => setPage(value)}
+    //                     sx={{color: '#fff'}}
+    //                 />
+    //             </Toolbar>
+    //         </AppBar>
+    //     );
+    // };
+
+    return (
+        <Container>
+            <TopBar
+                patient={patient}
+                handleDialogOpen={handleDialogOpen}
+                page={page}
+                setPage={setPage}
+                totalItems={samplesData.length}
+            />
+            <SampleDialog
+                open={dialogOpen}
+                handleClose={handleDialogClose}
+                newSampleData={newSampleData}
+                handleInputChange={handleInputChange}
+                handleAddSampleClick={handleAddSampleClick}
+            />
+            <Grid container spacing={2}>
+                {samplesData
+                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                    .slice((page - 1) * itemsPerPage, page * itemsPerPage)
+                    .map((sample) => (
+                        <Grid item xs={12} sm={6} md={4} key={sample.id}>
+                            <Sample>
+                                <Card>
+                                    <CardContent>
+                                        <Typography variant="body-2">Sample ID: {sample.id}</Typography>
+                                        <Typography variant="body2">
+                                            Stage: {sample.stage}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            {sample.markers_JSON && (
+                                                <>
+                                                    Markers:{" "}
+                                                    {Object.entries(
+                                                        typeof sample.markers_JSON === "string"
+                                                            ? JSON.parse(sample.markers_JSON)
+                                                            : sample.markers_JSON
+                                                    ).map(([key, value]) => (
+                                                        <div key={key}>{`${key}: ${value}`}</div>
+                                                    ))}
+                                                </>
+                                            )}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            Timestamp: {new Date(sample.timestamp).toLocaleString()}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => handleKnnClick(sample)}
+                                >
+                                    Generate KNN Output
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={() => handleDeleteClick(sample.id)}
+                                >
+                                    Delete Sample
+                                </Button>
+                            </Sample>
+                        </Grid>
+                    ))}
+            </Grid>
+        </Container>
+    );
 }
 
 export default PatientPage;
