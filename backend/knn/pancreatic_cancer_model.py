@@ -27,8 +27,7 @@ def classify_sample(sample):
 
     new_sample = pd.DataFrame([sample], columns=df_pancreatic.columns)
     new_sample.fillna(0, inplace=True)
-    
-    print(new_sample)
+
     
     # IF THERE WILL BE NEW VALUE IT WILL CAUSE ERROR
     new_sample['benign_sample_diagnosis'] = benign_sample_diagnosis_encoder.transform(new_sample['benign_sample_diagnosis'].astype(str))
