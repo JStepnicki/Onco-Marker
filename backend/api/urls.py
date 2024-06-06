@@ -16,11 +16,12 @@ urlpatterns = [
     path('patients/cancer_samples/delete/<int:pk>/', delete_cancer_sample, name='delete-cancer-sample'),
     path('patients/cancer_samples/update/<int:pk>/', update_cancer_sample, name='update-cancer-sample'),
     path('classify/', classify, name='classify'),
-    path('add_doctor/', add_doctor, name='add_doctor'),
+    path('add_doctor/', add_doctor, name='add-doctor'),
     path('register/', register, name='register'),
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
     path('user/', get_user, name='user'),
     path('reset_password/', reset_password, name='reset_password'),
     path('patient/results/<uuid:access_token>/', patient_results, name='patient_results'),
+    path('all_results/', get_all_cancer_samples, name='all_results'),
 ]

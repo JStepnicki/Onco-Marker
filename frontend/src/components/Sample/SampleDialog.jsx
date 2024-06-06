@@ -1,16 +1,5 @@
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    TextField,
-    DialogActions,
-    Button,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel, styled,
-} from "@mui/material";
-import {useState, useEffect} from "react";
+import React from 'react';
+import {Dialog, DialogContent, TextField, DialogActions, Button} from "@mui/material";
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 
 const theme = createTheme({
@@ -61,84 +50,78 @@ const theme = createTheme({
     },
 });
 
-const StyledDialog = styled(Dialog)({
-    "& .MuiDialogContent-root": {
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
-    },
-});
-
-function EditDialog({open, handleClose, patient, updatePatient}) {
-    const [editForm, setEditForm] = useState({
-        name: "",
-        surname: "",
-        age: "",
-        sex: "",
-    });
-
-    useEffect(() => {
-        setEditForm(patient);
-    }, [patient]);
-
-    const handleInputChange = (e) => {
-        setEditForm({...editForm, [e.target.name]: e.target.value});
-    };
-
-    const handleUpdate = () => {
-        updatePatient(patient.id, editForm);
-        handleClose();
-    };
-
+function SampleDialog({open, handleClose, newSampleData, handleInputChange, handleAddSampleClick}) {
     return (
         <ThemeProvider theme={theme}>
-            <StyledDialog open={open} onClose={handleClose}>
+            <Dialog open={open} onClose={handleClose}>
                 <DialogContent>
                     <TextField
-                        name="name"
-                        label="Name"
-                        value={editForm?.name}
-                        onChange={handleInputChange}
+                        margin="dense"
+                        name="organ_type"
+                        label="Organ Type"
+                        type="text"
                         fullWidth
+                        value={newSampleData.organ_type}
+                        onChange={handleInputChange}
                     />
                     <TextField
-                        name="surname"
-                        label="Surname"
-                        value={editForm?.surname}
-                        onChange={handleInputChange}
-                        fullWidth
-                    />
-                    <TextField
-                        name="email"
-                        label="Email"
-                        value={editForm?.email}
-                        onChange={handleInputChange}
-                        fullWidth
-                    />
-                    <TextField
-                        name="age"
-                        label="Age"
+                        margin="dense"
+                        name="plasma_CA19_9"
+                        label="Plasma CA19-9"
                         type="number"
-                        value={editForm?.age}
-                        onChange={handleInputChange}
                         fullWidth
+                        value={newSampleData.plasma_CA19_9}
+                        onChange={handleInputChange}
                     />
-                    <FormControl fullWidth>
-                        <InputLabel id="sex-label">Sex</InputLabel>
-                        <Select
-                            labelId="sex-label"
-                            name="sex"
-                            value={editForm?.sex}
-                            onChange={handleInputChange}
-                        >
-                            <MenuItem value={true}>Male</MenuItem>
-                            <MenuItem value={false}>Female</MenuItem>
-                        </Select>
-                    </FormControl>
+                    <TextField
+                        margin="dense"
+                        name="creatinine"
+                        label="Creatinine"
+                        type="number"
+                        fullWidth
+                        value={newSampleData.creatinine}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="LYVE1"
+                        label="LYVE1"
+                        type="number"
+                        fullWidth
+                        value={newSampleData.LYVE1}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="REG1B"
+                        label="REG1B"
+                        type="number"
+                        fullWidth
+                        value={newSampleData.REG1B}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="TFF1"
+                        label="TFF1"
+                        type="number"
+                        fullWidth
+                        value={newSampleData.TFF1}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="REG1A"
+                        label="REG1A"
+                        type="number"
+                        fullWidth
+                        value={newSampleData.REG1A}
+                        onChange={handleInputChange}
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button
-                        onClick={handleClose}
+                        onClick={() => setOpen(false)}
                         sx={{
                             backgroundColor: '#333',
                             color: '#fff',
@@ -151,7 +134,8 @@ function EditDialog({open, handleClose, patient, updatePatient}) {
                         Cancel
                     </Button>
                     <Button
-                        onClick={handleUpdate}
+                        onClick={handleAddSampleClick}
+                        type="submit"
                         sx={{
                             backgroundColor: '#333',
                             color: '#fff',
@@ -161,12 +145,13 @@ function EditDialog({open, handleClose, patient, updatePatient}) {
                             }
                         }}
                     >
-                        Update
+                        Add
                     </Button>
+
                 </DialogActions>
-            </StyledDialog>
+            </Dialog>
         </ThemeProvider>
     );
 }
 
-export default EditDialog;
+export default SampleDialog;

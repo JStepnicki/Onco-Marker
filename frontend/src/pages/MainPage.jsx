@@ -1,32 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { Typography, Link } from '@mui/material';
 import Login from '../components/Auth/Login';
+import Register from '../components/Auth/Register';
 import './MainPage.css';
 
 function MainPage() {
-  const navigate = useNavigate();
+    const [isRegister, setIsRegister] = useState(false);
 
+    const handleRegister = (event) => {
+        event.preventDefault();
+        setIsRegister(true);
+    };
 
-  const handleRegister = (event) => {
-    event.preventDefault();
-    navigate('/register');
-  };
+    const handleLogin = (event) => {
+        event.preventDefault();
+        setIsRegister(false);
+    };
 
-  return (
-    <div className="main-page">
-      <Typography variant="h4" component="h1" gutterBottom>
-        Log in
-      </Typography>
-      <Login />
-      <Typography variant="subtitle2">
-        Don't have an account?{' '}
-        <Link href="#" onClick={handleRegister} underline="hover">
-          Register
-        </Link>
-      </Typography>
-    </div>
-  );
+    return (
+        <div className="main-page">
+            {isRegister ? <Register /> : <Login />}
+            <Typography variant="subtitle2">
+                {isRegister ? 'Already have an account? ' : "Don't have an account? "}
+                <Link href="#" onClick={isRegister ? handleLogin : handleRegister} underline="hover">
+                    {isRegister ? 'Log in' : 'Register'}
+                </Link>
+            </Typography>
+        </div>
+    );
 }
 
 export default MainPage;
