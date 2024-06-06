@@ -1,5 +1,7 @@
 import json
+import random
 import uuid
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
@@ -510,3 +512,5 @@ class TestPatientViews(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn('error', json.loads(response.content.decode()))
+
+
