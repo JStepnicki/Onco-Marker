@@ -14,14 +14,12 @@ from api.models import Patient, CancerSample
 from api.serializers import CancerSampleSerializer
 from api.views import reset_password
 
+
 class TestPatientViews(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.add_patient_url = reverse('add-patient')
         self.patient_list_url = reverse('patient-list')
-
-
-
 
     def tearDown(self):
         Patient.objects.all().delete()
@@ -512,5 +510,7 @@ class TestPatientViews(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn('error', json.loads(response.content.decode()))
+
+
 
 
