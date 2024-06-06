@@ -32,9 +32,12 @@ const StyledTableCell = styled(TableCell)({
     color: '#555',
 });
 
-const StyledTableRow = styled(TableRow)({
+const StyledTableCellSort = styled(TableCell)({
+    fontWeight: 'bold',
+    color: '#555',
     '&:hover': {
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f5f5f5', // Change this to the color you want on hover
+        cursor: 'pointer',
     },
 });
 
@@ -45,6 +48,7 @@ function PatientList() {
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(1);
     const [editPatient, setEditPatient] = useState(null);
+    const [sortConfig, setSortConfig] = useState(null);
 
     const navigate = useNavigate();
 
@@ -70,6 +74,35 @@ function PatientList() {
         );
         setDisplayedPatients(filteredPatients.slice((page - 1) * 7, page * 7));
     }, [patients, page, search]);
+
+
+    const requestSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    useEffect(() => {
+        let sortedPatients = [...patients];
+        if (sortConfig !== null) {
+            sortedPatients.sort((a, b) => {
+                if (a[sortConfig.key] < b[sortConfig.key]) {
+                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                }
+                if (a[sortConfig.key] > b[sortConfig.key]) {
+                    return sortConfig.direction === 'ascending' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        const filteredPatients = sortedPatients.filter((patient) =>
+            (patient.name + ' ' + patient.surname).toLowerCase().includes(search.toLowerCase())
+        );
+        setDisplayedPatients(filteredPatients.slice((page - 1) * 7, page * 7));
+    }, [patients, page, search, sortConfig]);
+
 
     const handleExamineSamples = (patientId) => {
         const patient = patients.find((patient) => patient.id === patientId);
@@ -139,13 +172,13 @@ function PatientList() {
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
-                        <StyledTableRow>
-                            <StyledTableCell align="center">Gender</StyledTableCell>
-                            <StyledTableCell align="center">Name and Surname</StyledTableCell>
-                            <StyledTableCell align="center">Email</StyledTableCell>
-                            <StyledTableCell align="center">Age</StyledTableCell>
-                            <StyledTableCell align="center">Actions</StyledTableCell>
-                        </StyledTableRow>
+                        <TableRow>
+                            <StyledTableCellSort align="center" onClick={() => requestSort('sex')}>Gender</StyledTableCellSort>
+                            <StyledTableCellSort align="center" onClick={() => requestSort('name')}>Name and Surname</StyledTableCellSort>
+                            <StyledTableCellSort align="center" onClick={() => requestSort('email')}>Email</StyledTableCellSort>
+                            <StyledTableCellSort align="center" onClick={() => requestSort('age')}>Age</StyledTableCellSort>
+                            <StyledTableCellSort align="center">Actions</StyledTableCellSort>
+                        </TableRow>
                     </TableHead>
                     <TableBody>
                         {displayedPatients.map((patient) => (
