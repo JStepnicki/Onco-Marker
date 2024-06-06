@@ -20,7 +20,6 @@ import Filter from "../Header/Filter";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import EditDialog from "./EditDialog";
-import {createTheme} from '@mui/material/styles';
 
 
 
@@ -74,7 +73,7 @@ function PatientList() {
         const filteredPatients = patients.filter((patient) =>
             (patient.name + ' ' + patient.surname).toLowerCase().includes(search.toLowerCase())
         );
-        setDisplayedPatients(filteredPatients.slice((page - 1) * 7, page * 7));
+        setDisplayedPatients(filteredPatients.slice((page - 1) * 6, page * 6));
     }, [patients, page, search]);
 
 
@@ -102,7 +101,7 @@ function PatientList() {
         const filteredPatients = sortedPatients.filter((patient) =>
             (patient.name + ' ' + patient.surname).toLowerCase().includes(search.toLowerCase())
         );
-        setDisplayedPatients(filteredPatients.slice((page - 1) * 7, page * 7));
+        setDisplayedPatients(filteredPatients.slice((page - 1) * 6, page * 6));
     }, [patients, page, search, sortConfig]);
 
 
