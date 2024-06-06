@@ -69,7 +69,7 @@ function Filter({ search, setSearch, page, setPage, totalItems, addPatient }) {
           size="small"
         />
         <Pagination
-          count={Math.ceil(totalItems / 16)}
+          count={Math.ceil(totalItems / 7)}
           page={page}
           onChange={(_, value) => setPage(value)}
           color="primary"
