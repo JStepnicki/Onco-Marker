@@ -6,6 +6,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 from api.models import Patient, CancerSample
+from api.serializers import CancerSampleSerializer
 
 class TestPatientViews(TestCase):
     def setUp(self):
@@ -18,6 +19,7 @@ class TestPatientViews(TestCase):
 
     def tearDown(self):
         Patient.objects.all().delete()
+        CancerSample.objects.all().delete()
 
     def test_add_patient(self):
         patient_data = {
@@ -171,10 +173,12 @@ class TestPatientViews(TestCase):
         self.assertEqual(cancer_sample.markers_JSON["TFF1"], 654.282174)
         self.assertEqual(cancer_sample.markers_JSON["REG1A"], 1262)
 
-    def test_add_patient_cancer_sample_invalid_data(self):
-        patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
+
+    def test_add_patient_cancer_sample_patient_not_found(self):
+        non_existent_patient_id = 99999
 
         data = {
+            "organ_type": "pancreas",
             "stage": "",
             "benign_sample_diagnosis": "",
             "markers_JSON": {
@@ -187,11 +191,142 @@ class TestPatientViews(TestCase):
             },
             "diagnosis": ""
         }
-        self.add_patient_cancer_sample_url = reverse('add-patient-cancer-sample', kwargs={'pk': patient.pk})
+
+        self.add_patient_cancer_sample_url = reverse('add-patient-cancer-sample',
+                                                     kwargs={'pk': non_existent_patient_id})
 
         response = self.client.post(self.add_patient_cancer_sample_url, data=json.dumps(data),
                                     content_type='application/json')
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-        self.assertFalse(CancerSample.objects.filter(patient=patient).exists())
+    def test_delete_cancer_sample(self):
+        patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
+        sample = CancerSample.objects.create(patient=patient, organ_type="pancreas", stage="",
+                                             benign_sample_diagnosis="", markers_JSON={}, diagnosis="")
+
+        delete_cancer_sample_url = reverse('delete-cancer-sample', kwargs={'pk': sample.pk})
+
+        response = self.client.delete(delete_cancer_sample_url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        self.assertFalse(CancerSample.objects.filter(pk=sample.pk).exists())
+
+    def test_delete_cancer_sample_not_found(self):
+        non_existent_sample_id = 99999
+
+        delete_cancer_sample_url = reverse('delete-cancer-sample', kwargs={'pk': non_existent_sample_id})
+
+        response = self.client.delete(delete_cancer_sample_url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_cancer_sample(self):
+        patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
+        sample = CancerSample.objects.create(patient=patient, organ_type="pancreas", stage="",
+                                             benign_sample_diagnosis="", markers_JSON={}, diagnosis="")
+
+        updated_data = {
+            "patient": patient.pk,
+            "organ_type": "liver",
+            "stage": "II",
+            "benign_sample_diagnosis": "None",
+            "markers_JSON": {
+                "plasma_CA19_9": 20.5,
+                "creatinine": 1.2,
+                "LYVE1": 0.5,
+                "REG1B": 45.0,
+                "TFF1": 600.0,
+                "REG1A": 1200
+            },
+            "diagnosis": "Updated diagnosis"
+        }
+
+        update_cancer_sample_url = reverse('update-cancer-sample', kwargs={'pk': sample.pk})
+
+        response = self.client.put(update_cancer_sample_url, data=json.dumps(updated_data),
+                                   content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        sample.refresh_from_db()
+
+        self.assertEqual(sample.organ_type, "liver")
+        self.assertEqual(sample.stage, "II")
+        self.assertEqual(sample.benign_sample_diagnosis, "None")
+        self.assertEqual(sample.markers_JSON, {
+            "plasma_CA19_9": 20.5,
+            "creatinine": 1.2,
+            "LYVE1": 0.5,
+            "REG1B": 45.0,
+            "TFF1": 600.0,
+            "REG1A": 1200
+        })
+        self.assertEqual(sample.diagnosis, "Updated diagnosis")
+
+    def test_update_cancer_sample_not_found(self):
+        non_existent_sample_id = 99999
+
+        updated_data = {
+            "organ_type": "liver",
+            "stage": "II",
+            "benign_sample_diagnosis": "None",
+            "markers_JSON": {
+                "plasma_CA19_9": 20.5,
+                "creatinine": 1.2,
+                "LYVE1": 0.5,
+                "REG1B": 45.0,
+                "TFF1": 600.0,
+                "REG1A": 1200
+            },
+            "diagnosis": "Updated diagnosis"
+        }
+
+        update_cancer_sample_url = reverse('update-cancer-sample', kwargs={'pk': non_existent_sample_id})
+
+        response = self.client.put(update_cancer_sample_url, data=json.dumps(updated_data),
+                                   content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_cancer_samples_list(self):
+        patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
+        sample1 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+                                              diagnosis="", organ_type="")
+        sample2 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+                                              diagnosis="", organ_type="")
+
+        url = reverse('cancer-sample-list')
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.data
+
+        expected_data = CancerSampleSerializer(instance=[sample1, sample2], many=True).data
+        self.assertEqual(data, expected_data)
+
+    def test_get_single_cancer_sample(self):
+        patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
+        sample = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+                                             diagnosis="", organ_type="")
+
+        url = reverse('cancer-sample-list')
+
+        response = self.client.get(url, {'sample_id': sample.pk})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.data
+
+        expected_data = CancerSampleSerializer(instance=sample).data
+        self.assertEqual(data, expected_data)
+
+    def test_get_single_cancer_sample_not_found(self):
+        url = reverse('cancer-sample-list')
+
+        response = self.client.get(url, {'sample_id': 9999})
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
