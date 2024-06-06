@@ -1,46 +1,31 @@
-import React, {useEffect, useState} from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import TopBar from "../components/Header/TopBar.jsx";
+import DeleteIcon from '../components/Icons/Delete';
+import ProfileIcon from '../components/Icons/Profile';
+import PancreasIcon from "../components/Icons/Pancreas.jsx";
 import axios from "axios";
 import {
     Typography,
     Card,
     CardContent,
     Grid,
-    Paper,
     Box,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    Select,
-    MenuItem,
-    Pagination,
-    AppBar,
-    Toolbar,
+    CardHeader,
+    CardActions,
 } from "@mui/material";
 import SampleDialog from "../components/Sample/SampleDialog.jsx";
-import {styled} from "@mui/system";
-
-// const Container = styled("div")({
-//     display: "flex",
-//     flexDirection: "column",
-//     alignItems: "center",
-//     justifyContent: "center",
-//     gap: "20px",
-// });
+import { styled } from "@mui/system";
 
 const StyledBox = styled(Box)({
     flexGrow: 1,
-    margin: "16px",
+    margin: "8px",
 });
 
 const Sample = styled("div")({
     border: "1px solid #ddd",
     borderRadius: "5px",
-    padding: "10px",
+    padding: "8px",
     width: "50%",
 });
 
@@ -50,7 +35,7 @@ function PatientPage() {
     const [page, setPage] = useState(1);
     const itemsPerPage = 6;
     const [newSampleData, setNewSampleData] = useState({
-        organ_type: "", // Dodaj pole organ_type
+        organ_type: "",
         plasma_CA19_9: "",
         creatinine: "",
         LYVE1: "",
@@ -64,15 +49,11 @@ function PatientPage() {
 
     const handleDeleteClick = async (sampleId) => {
         try {
-            const response = await axios.delete(
-                `${
-                    import.meta.env.VITE_API_URL
-                }patients/cancer_samples/delete/${sampleId}/`
-            );
+            await axios.delete(`${import.meta.env.VITE_API_URL}patients/cancer_samples/delete/${sampleId}/`);
             setSamplesData(samplesData.filter((sample) => sample.id !== sampleId));
         } catch (error) {
             navigate("/error", {
-                state: {status: error.response.status, message: error.message},
+                state: { status: error.response.status, message: error.message },
             });
         }
     };
@@ -80,15 +61,11 @@ function PatientPage() {
     useEffect(() => {
         const fetchPatientData = async () => {
             try {
-                const response = await axios.get(
-                    `${import.meta.env.VITE_API_URL}patients/cancer_samples/${
-                        patient.id
-                    }/`
-                );
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}patients/cancer_samples/${patient.id}/`);
                 setSamplesData(response.data);
             } catch (error) {
                 navigate("/error", {
-                    state: {status: error.response.status, message: error.message},
+                    state: { status: error.response.status, message: error.message },
                 });
             }
         };
@@ -118,31 +95,24 @@ function PatientPage() {
                 patient_id: patient.id,
             };
 
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}classify/`,
-                classificationData
-            );
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}classify/`, classificationData);
 
             const data = response.data;
             sample.diagnosis = data[0];
             sample.stage = data[0];
 
+            setSamplesData(samplesData.map((item) => (item.id === sample.id ? sample : item)));
 
-            setSamplesData(
-                samplesData.map((item) => (item.id === sample.id ? sample : item))
-            );
-
-            navigate(`/patients/${patient.id}/results`, {state: {sample}});
+            navigate(`/patients/${patient.id}/results`, { state: { sample } });
         } catch (error) {
-            console.error("Error:", error); // Log the full error for debugging
+            console.error("Error:", error);
             const status = error.response ? error.response.status : 500;
             const message = error.message ? error.message : 'Something went wrong';
             navigate("/error", {
-                state: {status, message},
+                state: { status, message },
             });
         }
     };
-
 
     const handleDialogOpen = () => {
         setDialogOpen(true);
@@ -169,22 +139,16 @@ function PatientPage() {
             REG1A: newSampleData.REG1A,
         };
 
-        const {plasma_CA19_9, creatinine, LYVE1, REG1B, TFF1, REG1A, ...rest} =
-            newSampleData;
+        const { plasma_CA19_9, creatinine, LYVE1, REG1B, TFF1, REG1A, ...rest } = newSampleData;
 
         const dataToSend = {
             ...rest,
             markers_JSON: markers,
-            organ_type: newSampleData.organ_type, // Dodaj pole organ_type
+            organ_type: newSampleData.organ_type,
         };
 
         try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}patients/cancer_samples/add/${
-                    patient.id
-                }/`,
-                dataToSend
-            );
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}patients/cancer_samples/add/${patient.id}/`, dataToSend);
 
             if (response.status === 201) {
                 const new_sample = response.data;
@@ -192,12 +156,12 @@ function PatientPage() {
                 handleDialogClose();
             } else {
                 navigate("/error", {
-                    state: {status: error.response.status, message: error.message},
+                    state: { status: error.response.status, message: error.message },
                 });
             }
         } catch (error) {
             navigate("/error", {
-                state: {status: error.response.status, message: error.message},
+                state: { status: error.response.status, message: error.message },
             });
         }
     };
@@ -218,53 +182,39 @@ function PatientPage() {
                 handleInputChange={handleInputChange}
                 handleAddSampleClick={handleAddSampleClick}
             />
-            <Grid container spacing={2}>
+            <Grid container spacing={1} sx={{ justifyContent: 'center' }}>
                 {samplesData
                     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
                     .slice((page - 1) * itemsPerPage, page * itemsPerPage)
                     .map((sample) => (
-                        <Grid item xs={12} sm={6} md={4} key={sample.id}>
-                            <Sample>
-                                <Card>
-                                    <CardContent>
-                                        <Typography variant="body-2">Sample ID: {sample.id}</Typography>
-                                        <Typography variant="body2">
-                                            Stage: {sample.stage}
-                                        </Typography>
-                                        <Typography variant="body2">
-                                            {sample.markers_JSON && (
-                                                <>
-                                                    Markers:{" "}
-                                                    {Object.entries(
-                                                        typeof sample.markers_JSON === "string"
-                                                            ? JSON.parse(sample.markers_JSON)
-                                                            : sample.markers_JSON
-                                                    ).map(([key, value]) => (
-                                                        <div key={key}>{`${key}: ${value}`}</div>
-                                                    ))}
-                                                </>
-                                            )}
-                                        </Typography>
-                                        <Typography variant="body2">
-                                            Timestamp: {new Date(sample.timestamp).toLocaleString()}
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => handleKnnClick(sample)}
-                                >
-                                    Generate KNN Output
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    onClick={() => handleDeleteClick(sample.id)}
-                                >
-                                    Delete Sample
-                                </Button>
-                            </Sample>
+                        <Grid item xs={12} sm={6} md={4} lg={4} key={sample.id}>
+                            <Card sx={{ marginBottom: '4px', height: '100%' }}>
+                                <CardHeader
+                                    title={`Sample ID: ${sample.id}`}
+                                    subheader={`Timestamp: ${new Date(sample.timestamp).toLocaleString()}`}
+                                    action={<PancreasIcon onClick={() => handleDeleteClick(sample.id)} />}
+                                    sx={{ backgroundColor: '#f5f5f5', padding: '8px' }}
+                                />
+                                <CardContent sx={{ padding: '16px' }}>
+                                    <Typography variant="body2">
+                                        {sample.markers_JSON && (
+                                            <>
+                                                {Object.entries(
+                                                    typeof sample.markers_JSON === "string"
+                                                        ? JSON.parse(sample.markers_JSON)
+                                                        : sample.markers_JSON
+                                                ).map(([key, value]) => (
+                                                    <div key={key}>{`${key}: ${value}`}</div>
+                                                ))}
+                                            </>
+                                        )}
+                                    </Typography>
+                                </CardContent>
+                                <CardActions sx={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px' }}>
+                                    <ProfileIcon onClick={() => handleKnnClick(sample)} />
+                                    <DeleteIcon onClick={() => handleDeleteClick(sample.id)} />
+                                </CardActions>
+                            </Card>
                         </Grid>
                     ))}
             </Grid>
