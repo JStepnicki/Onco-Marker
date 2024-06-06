@@ -33,10 +33,13 @@ class PatientSerializer(ModelSerializer):
 
 
 
-class CancerSampleSerializer(ModelSerializer):
+class CancerSampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = CancerSample
-        fields = ('id', 'patient', 'stage', 'benign_sample_diagnosis' ,'markers_JSON', 'timestamp', 'diagnosis', 'organ_type')
+        fields = ['patient', 'organ_type', 'stage', 'benign_sample_diagnosis', 'markers_JSON', 'diagnosis']
+        extra_kwargs = {
+            'organ_type': {'required': True},
+        }
 
 class UserRegisterSerializer(ModelSerializer):
     class Meta:

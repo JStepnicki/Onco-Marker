@@ -133,14 +133,12 @@ class TestPatientViews(TestCase):
             self.assertEqual(response_data['email'], 'john.doe@example.com')
 
     def test_add_patient_cancer_sample(self):
-        # Dodajemy pacjenta do bazy danych
         patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
 
-        # Dane próbki nowotworowej
         data = {
             "organ_type": "pancreas",
-            "stage": "",  # Brak informacji o stadium w przykładzie
-            "benign_sample_diagnosis": "",  # Brak informacji o diagnozie próbki benignnej w przykładzie
+            "stage": "",
+            "benign_sample_diagnosis": "",
             "markers_JSON": {
                 "plasma_CA19_9": 11.7,
                 "creatinine": 1.83222,
@@ -149,25 +147,19 @@ class TestPatientViews(TestCase):
                 "TFF1": 654.282174,
                 "REG1A": 1262
             },
-            "diagnosis": ""  # Brak informacji o diagnozie w przykładzie
+            "diagnosis": ""
         }
-        # Tutaj przekazujemy patient.pk jako argument pk
         self.add_patient_cancer_sample_url = reverse('add-patient-cancer-sample', kwargs={'pk': patient.pk})
 
-        # Wysyłanie żądania POST z danymi próbki nowotworowej
         response = self.client.post(self.add_patient_cancer_sample_url, data=json.dumps(data),
                                     content_type='application/json')
 
-        # Sprawdzanie czy status odpowiedzi to 201 Created
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        # Sprawdzanie czy próbka nowotworowa została dodana do pacjenta
         self.assertTrue(CancerSample.objects.filter(patient=patient).exists())
 
-        # Pobieranie dodanej próbki nowotworowej
         cancer_sample = CancerSample.objects.get(patient=patient)
 
-        # Sprawdzanie czy dane próbki nowotworowej się zgadzają
         self.assertEqual(cancer_sample.organ_type, "pancreas")
         self.assertEqual(cancer_sample.stage, "")
         self.assertEqual(cancer_sample.benign_sample_diagnosis, "")
@@ -178,3 +170,28 @@ class TestPatientViews(TestCase):
         self.assertEqual(cancer_sample.markers_JSON["REG1B"], 52.94884)
         self.assertEqual(cancer_sample.markers_JSON["TFF1"], 654.282174)
         self.assertEqual(cancer_sample.markers_JSON["REG1A"], 1262)
+
+    def test_add_patient_cancer_sample_invalid_data(self):
+        patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
+
+        data = {
+            "stage": "",
+            "benign_sample_diagnosis": "",
+            "markers_JSON": {
+                "plasma_CA19_9": 11.7,
+                "creatinine": 1.83222,
+                "LYVE1": 0.8932192,
+                "REG1B": 52.94884,
+                "TFF1": 654.282174,
+                "REG1A": 1262
+            },
+            "diagnosis": ""
+        }
+        self.add_patient_cancer_sample_url = reverse('add-patient-cancer-sample', kwargs={'pk': patient.pk})
+
+        response = self.client.post(self.add_patient_cancer_sample_url, data=json.dumps(data),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.assertFalse(CancerSample.objects.filter(patient=patient).exists())
