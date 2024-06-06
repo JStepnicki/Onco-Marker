@@ -1,69 +1,60 @@
 import pandas as pd
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import StandardScaler
+from api.models import CancerSample
 
-def classify_sample(sample):
-    headlines = ["sample_id", "patient_cohort", "sample_origin", "age", "sex", "diagnosis", "stage",
-                "benign_sample_diagnosis", "plasma_CA19_9", "creatinine", "LYVE1", "REG1B", "TFF1", "REG1A"]
-    df_pancreatic = pd.read_csv('knn/resources/pancreatic_cancer_dataset.csv', names=headlines, skiprows=1)
-
-    df_pancreatic.drop(columns=["sample_id", "patient_cohort", "sample_origin"], inplace=True) #dropuje kolumny ktore nie maja wplywu na diagnoze
-
-    df_pancreatic.fillna(0, inplace=True) #uzupelnia brakujace wartosci zerami (nan -> 0)
-    df_pancreatic['benign_sample_diagnosis'] = df_pancreatic['benign_sample_diagnosis'].astype(str)
-    df_pancreatic['stage'] = df_pancreatic['stage'].astype(str) #zmieniam typ danych na string
-    benign_sample_diagnosis_encoder = LabelEncoder()
-    df_pancreatic['benign_sample_diagnosis'] = benign_sample_diagnosis_encoder.fit_transform(df_pancreatic['benign_sample_diagnosis'])
-    
-    sex_encoder = LabelEncoder()
-    df_pancreatic['sex'] = sex_encoder.fit_transform(df_pancreatic['sex'])
-
-    stage_encoder = LabelEncoder()
-    df_pancreatic['stage'] = stage_encoder.fit_transform(df_pancreatic['stage'])
+from sklearn.preprocessing import StandardScaler
 
 
+def classify_sample(sample_id, organ_type):
+    sample_from_db = CancerSample.objects.get(id=sample_id)
+    sample_markers_df = pd.json_normalize(sample_from_db.get_markers())
 
-    new_sample = pd.DataFrame([sample], columns=df_pancreatic.columns)
-    new_sample.fillna(0, inplace=True)
+    queryset = CancerSample.objects.filter(organ_type=organ_type, diagnosis__isnull=False)
+    sample_df = pd.DataFrame(list(queryset.values()))
 
-    
-    # IF THERE WILL BE NEW VALUE IT WILL CAUSE ERROR
-    new_sample['benign_sample_diagnosis'] = benign_sample_diagnosis_encoder.transform(new_sample['benign_sample_diagnosis'].astype(str))
-    new_sample['sex'] = sex_encoder.transform(new_sample['sex'])
-    new_sample['stage'] = stage_encoder.transform(new_sample['stage'])
+    markers_df = pd.json_normalize(sample_df['markers_JSON'])
 
-    
-    new_sample_x = new_sample.drop(columns=["diagnosis"])
-    pancreatic_x = df_pancreatic.drop(columns=["diagnosis"])
-    pancreatic_y = df_pancreatic["diagnosis"]
+    sample_df.drop(columns=["id", "timestamp", "organ_type", 'patient_id', 'benign_sample_diagnosis', 'markers_JSON', 'stage'], inplace=True)
+    sample_df = pd.concat([sample_df, markers_df], axis=1)
+    sample_df.fillna(0, inplace=True)
 
     scaler = StandardScaler()
-    pancreatic_x = scaler.fit_transform(pancreatic_x)
-    new_sample_x = scaler.transform(new_sample_x)
+    X_scaled = scaler.fit_transform(sample_df.drop(columns=["diagnosis"]))
+
+    X_diagnosis = pd.DataFrame(X_scaled, columns=sample_df.columns[:-1])  # Exclude 'diagnosis' column
+    y_diagnosis = sample_df["diagnosis"]
 
     knn = KNeighborsClassifier(n_neighbors=3)
-    knn.fit(pancreatic_x, pancreatic_y)
+    knn.fit(X_diagnosis, y_diagnosis)
 
-    y_pred_pancreatic = knn.predict(new_sample_x)[0]
-    y_pred_pancreatic_second_classification = None
+    sample_markers_np = sample_markers_df.to_numpy()[0]
+
+    y_pred = knn.predict([sample_markers_np])[0]
+
+    stage_pred = 0
+    if y_pred == 3:
+        queryset_second = CancerSample.objects.filter(diagnosis=3, organ_type=organ_type)
+        sample_df_second = pd.DataFrame(list(queryset_second.values()))
+        markers_df_second = pd.json_normalize(sample_df_second['markers_JSON'])
+        sample_df_second.drop(columns=["id", "timestamp", "organ_type", 'patient_id', 'benign_sample_diagnosis', 'markers_JSON', 'diagnosis'],
+                              inplace=True)
+        sample_df_second = pd.concat([sample_df_second, markers_df_second], axis=1)
+        sample_df_second.fillna(0, inplace=True)
+
+        # Scale the features for stage classification
+        X_stage_scaled = scaler.transform(sample_df_second.drop(columns=["stage"]))
+        X_stage = pd.DataFrame(X_stage_scaled, columns=sample_df_second.columns[:-1])  # Exclude 'stage' column
+        y_stage = sample_df_second["stage"]
+        knn_stage = KNeighborsClassifier(n_neighbors=3)
+        knn_stage.fit(X_stage, y_stage)
+        sample_markers_np = sample_markers_df.to_numpy()[0]
+
+        stage_pred = knn_stage.predict([sample_markers_np])[0]
+
+    sample_from_db.diagnosis = y_pred
+    sample_from_db.stage = stage_pred
+    sample_from_db.save()
+    return y_pred, stage_pred
 
 
-    if y_pred_pancreatic == 3: #tu sie zaczyna druga klasyfikacja
-        new_sample_second_classification_x = new_sample.drop(columns=["stage"]) #to jest dalej symulacja nowej probki (tej samej co w 1 klasyfikacji) bo nie wiem jak to bedzie dodawane przez api
-
-        df_second = df_pancreatic[df_pancreatic["diagnosis"] == 3] #tutaj ucinam dataframe tylko do tych wierszy co maja diagnosis 3 i tym samym maja jakas wartosc stage
-        pancreatic_x_second_classification = df_second.drop(columns=["stage"])
-        pancreatic_y_second_classification = df_second["stage"]
-
-        scaler2 = StandardScaler()
-        pancreatic_x_second_classification = scaler2.fit_transform(pancreatic_x_second_classification)
-        new_sample_second_classification_x = scaler2.transform(new_sample_second_classification_x)
-
-        knn.fit(pancreatic_x_second_classification, pancreatic_y_second_classification)
-
-        y_pred_pancreatic_second_classification = knn.predict(new_sample_second_classification_x)[0]
-
-
-    return y_pred_pancreatic, y_pred_pancreatic_second_classification
