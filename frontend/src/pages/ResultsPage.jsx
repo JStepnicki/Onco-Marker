@@ -97,16 +97,17 @@ function ResultsPage() {
           Benign Sample Diagnosis: {sample.benign_sample_diagnosis}
         </Typography>
         <Typography variant="body2">Markers: </Typography>
-        {sample.markers_JSON &&
-          Object.entries(JSON.parse(sample.markers_JSON)).map(
-            ([key, value]) =>
-              value && (
-                <Typography
-                  key={key}
-                  variant="body2"
-                >{`${key}: ${value}`}</Typography>
-              )
-          )}
+{sample.markers_JSON &&
+  Object.entries(sample.markers_JSON).map(
+    ([key, value]) =>
+      value && (
+        <Typography
+          key={key}
+          variant="body2"
+        >{`${key}: ${value}`}</Typography>
+      )
+  )}
+          <Typography variant="body2">Patient Information:</Typography>
         <Typography variant="body2">
           Timestamp: {new Date(sample.timestamp).toLocaleString()}
         </Typography>

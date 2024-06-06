@@ -125,6 +125,7 @@ def classify(request):
     data = json.loads(request.body)
     patient = Patient.objects.get(pk=data['patient_id'])
     sample_id = data['sample_id']
+    organ_type = data['organ_type']
     access_token = patient.access_token
     
     subject = "Your Medical Test Results"
@@ -139,7 +140,7 @@ def classify(request):
         data = json.loads(request.body)
         if data is None:
             return Response({"error": "data not provided"}, status=400)
-        result = classify_sample(data)
+        result = classify_sample(sample_id, organ_type)
         
         # get patiend access token fro mdb 
         # patient = Patient.objects.get(pk=data['patient_id'])

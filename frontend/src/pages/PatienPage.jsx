@@ -84,48 +84,64 @@ function PatientPage() {
     fetchPatientData();
   }, []);
 
-  const handleKnnClick = async (sample) => {
-    try {
-      const markers = JSON.parse(sample.markers_JSON);
-
-      const patientData = {
-        sample_id: sample.id,
-        patient_id: patient.id,
-        age: patient.age,
-        sex: patient.sex ? "M" : "F",
-        stage: sample.stage,
-        benign_sample_diagnosis: sample.benign_sample_diagnosis,
-        organ_type: sample.organ_type,
-        ...markers,
-      };
-
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}classify/`,
-        patientData
-      );
-
-      const data = response.data;
-
-      sample.diagnosis = data[0];
-      sample.stage = data[0];
-
-      const updateResponse = await axios.put(
-        `${import.meta.env.VITE_API_URL}patients/cancer_samples/update/${
-          sample.id
-        }/`,
-        sample
-      );
-
-      setSamplesData(
-        samplesData.map((item) => (item.id === sample.id ? sample : item))
-      );
-      navigate(`/patients/${patient.id}/results`, { state: { sample } });
-    } catch (error) {
-      navigate("/error", {
-        state: { status: error.response.status, message: error.message },
-      });
+const handleKnnClick = async (sample) => {
+  try {
+    // Ensure markers_JSON is parsed correctly
+    let markers;
+    if (typeof sample.markers_JSON === 'string') {
+      try {
+        markers = JSON.parse(sample.markers_JSON);
+      } catch (parseError) {
+        throw new Error(`Invalid JSON format in markers_JSON: ${parseError.message}`);
+      }
+    } else if (typeof sample.markers_JSON === 'object') {
+      markers = sample.markers_JSON;
+    } else {
+      throw new Error('markers_JSON is not a valid JSON format or object');
     }
-  };
+
+    // Prepare data to send to classification endpoint
+    const classificationData = {
+      ...markers,
+      organ_type: sample.organ_type,
+      sample_id: sample.id, // Add sample_id to the classification data
+      patient_id: patient.id, // Add patient_id to the classification data
+    };
+
+    // Send markers and organ_type to the classification endpoint
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}classify/`,
+      classificationData
+    );
+
+    const data = response.data;
+
+    // Update the sample with the diagnosis and stage from the response
+    sample.diagnosis = data[0];
+    sample.stage = data[0];
+
+
+
+    // Update the local state with the modified sample
+    setSamplesData(
+      samplesData.map((item) => (item.id === sample.id ? sample : item))
+    );
+
+    // Navigate to the results page
+    navigate(`/patients/${patient.id}/results`, { state: { sample } });
+  } catch (error) {
+    console.error("Error:", error); // Log the full error for debugging
+    const status = error.response ? error.response.status : 500;
+    const message = error.message ? error.message : 'Something went wrong';
+    navigate("/error", {
+      state: { status, message },
+    });
+  }
+};
+
+
+
+
 
   const handleDialogOpen = () => {
     setDialogOpen(true);
@@ -157,7 +173,7 @@ function PatientPage() {
 
     const dataToSend = {
       ...rest,
-      markers_JSON: JSON.stringify(markers),
+      markers_JSON: markers,
       organ_type: newSampleData.organ_type, // Dodaj pole organ_type
     };
 
@@ -282,37 +298,32 @@ function PatientPage() {
         </Grid>
       </Grid>
 
-      {samplesData
+     {samplesData
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
         .map((sample) => (
           <Sample key={sample.id}>
             <Card>
               <CardContent>
-                <Typography variant="body-2" style={{ display: "block" }}>
-                  Organ Type: {sample.organ_type}
-                </Typography>
-                <Typography variant="body-2" style={{ display: "block" }}>
-                  Diagnosis: {sample.diagnosis}
-                </Typography>
-                <Typography variant="body2" style={{ display: "block" }}>
+                <Typography variant="body-2">Sample ID: {sample.id}</Typography>
+                <Typography variant="body2">
                   Stage: {sample.stage}
                 </Typography>
                 <Typography variant="body2">
-                  Benign Sample Diagnosis {sample.benign_sample_diagnosis}
+                  Benign Sample Diagnosis: {sample.benign_sample_diagnosis}
                 </Typography>
                 <Typography variant="body2">
-                  {JSON.parse(sample.markers_JSON) &&
-                    Object.values(JSON.parse(sample.markers_JSON)).some(
-                      (value) => value
-                    ) && (
-                      <>
-                        Markers:{" "}
-                        {Object.entries(JSON.parse(sample.markers_JSON)).map(
-                          ([key, value]) =>
-                            value && <div key={key}>{`${key}: ${value}`}</div>
-                        )}
-                      </>
-                    )}
+                  {sample.markers_JSON && (
+                    <>
+                      Markers:{" "}
+                      {Object.entries(
+                        typeof sample.markers_JSON === "string"
+                          ? JSON.parse(sample.markers_JSON)
+                          : sample.markers_JSON
+                      ).map(([key, value]) => (
+                        <div key={key}>{`${key}: ${value}`}</div>
+                      ))}
+                    </>
+                  )}
                 </Typography>
                 <Typography variant="body2">
                   Timestamp: {new Date(sample.timestamp).toLocaleString()}
