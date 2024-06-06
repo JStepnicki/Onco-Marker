@@ -86,7 +86,6 @@ function PatientPage() {
 
 const handleKnnClick = async (sample) => {
   try {
-    // Ensure markers_JSON is parsed correctly
     let markers;
     if (typeof sample.markers_JSON === 'string') {
       try {
@@ -100,15 +99,13 @@ const handleKnnClick = async (sample) => {
       throw new Error('markers_JSON is not a valid JSON format or object');
     }
 
-    // Prepare data to send to classification endpoint
     const classificationData = {
       ...markers,
       organ_type: sample.organ_type,
-      sample_id: sample.id, // Add sample_id to the classification data
-      patient_id: patient.id, // Add patient_id to the classification data
+      sample_id: sample.id,
+      patient_id: patient.id,
     };
 
-    // Send markers and organ_type to the classification endpoint
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}classify/`,
       classificationData
@@ -116,13 +113,9 @@ const handleKnnClick = async (sample) => {
 
     const data = response.data;
 
-    // Update the sample with the diagnosis and stage from the response
     sample.diagnosis = data[0];
-    sample.stage = data[0];
+    sample.stage = data[1];
 
-
-
-    // Update the local state with the modified sample
     setSamplesData(
       samplesData.map((item) => (item.id === sample.id ? sample : item))
     );
@@ -130,7 +123,7 @@ const handleKnnClick = async (sample) => {
     // Navigate to the results page
     navigate(`/patients/${patient.id}/results`, { state: { sample } });
   } catch (error) {
-    console.error("Error:", error); // Log the full error for debugging
+    console.error("Error:", error);
     const status = error.response ? error.response.status : 500;
     const message = error.message ? error.message : 'Something went wrong';
     navigate("/error", {
@@ -138,9 +131,6 @@ const handleKnnClick = async (sample) => {
     });
   }
 };
-
-
-
 
 
   const handleDialogOpen = () => {
@@ -174,7 +164,7 @@ const handleKnnClick = async (sample) => {
     const dataToSend = {
       ...rest,
       markers_JSON: markers,
-      organ_type: newSampleData.organ_type, // Dodaj pole organ_type
+      organ_type: newSampleData.organ_type,
     };
 
     try {
