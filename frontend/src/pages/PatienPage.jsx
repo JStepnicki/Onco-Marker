@@ -125,7 +125,7 @@ function PatientPage() {
 
             // Update the sample with the diagnosis and stage from the response
             sample.diagnosis = data[0];
-            sample.stage = data[0];
+            sample.stage = data[1];
 
 
             // Update the local state with the modified sample
