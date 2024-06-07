@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
-from api.models import Patient, CancerSample
+from api.models import Patient, CancerSample, Doctor
 from api.serializers import CancerSampleSerializer
 from api.views import reset_password
 
@@ -511,6 +511,109 @@ class TestPatientViews(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn('error', json.loads(response.content.decode()))
 
+    def test_add_doctor_success(self):
+        url = reverse('add_doctor')
+        data = {
+            "name": "John",
+            "surname": "Doe",
+            "user": {
+                "username": "johndoe",
+                "password": "password123",
+                "email": "johndoe@example.com"
+            }
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Doctor.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(Doctor.objects.get().name, 'John')
+        self.assertEqual(Doctor.objects.get().surname, 'Doe')
+        self.assertEqual(User.objects.get().username, 'johndoe')
 
+    # def test_add_doctor_invalid_data(self): #TODO dodac walidacje dla modelu doktora
+    #     url = reverse('add_doctor')
+    #     data = {
+    #         "name": "",
+    #         "surname": "",
+    #         "user": {
+    #             "username": "johndoe",
+    #             "password": "password123",
+    #             "email": "johndoe@example.com"
+    #         }
+    #     }
+    #     response = self.client.post(url, data, format='json')
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    #     self.assertEqual(Doctor.objects.count(), 0)
+    #     self.assertEqual(User.objects.count(), 0)
 
+    @patch('api.views.send_mail')
+    def test_classify_success(self, mock_send_mail):
+        mock_send_mail.return_value = 1
 
+        patient = Patient.objects.create(
+            id=1,
+            name="Test Patient",
+            email="test@example.com",
+            access_token="testtoken"
+        )
+
+        url = reverse('classify')
+        data = {
+            "patient_id": patient.id,
+            "sample_id": "sample123",
+            "organ_type": "liver"
+        }
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'result': 'positive'})
+        mock_send_mail.assert_called_once()
+
+    def test_classify_invalid_json(self):
+        url = reverse('classify')
+        response = self.client.post(url, "invalid json", content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {"error": "Invalid JSON"})
+
+    def test_classify_missing_data(self):
+        url = reverse('classify')
+        response = self.client.post(url, {}, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {"error": "data not provided"})
+
+    def test_classify_patient_not_found(self):
+        url = reverse('classify')
+        data = {
+            "patient_id": 999,
+            "sample_id": "sample123",
+            "organ_type": "liver"
+        }
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, {"error": "Patient not found"})
+
+    @patch('api.views.send_mail')
+    def test_classify_general_exception(self, mock_send_mail):
+        patient = Patient.objects.create(
+            id=1,
+            name="Test Patient",
+            email="test@example.com",
+            access_token="testtoken"
+        )
+
+        # Mock the classify_sample function to raise an exception
+        with patch('myapp.views.classify_sample', side_effect=Exception("Test exception")):
+            url = reverse('classify')
+            data = {
+                "patient_id": patient.id,
+                "sample_id": "sample123",
+                "organ_type": "liver"
+            }
+            response = self.client.post(url, data, format='json')
+
+            self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+            self.assertEqual(response.data, {"error": "Test exception"})
+            mock_send_mail.assert_called_once()

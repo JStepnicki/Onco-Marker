@@ -122,41 +122,32 @@ def cancer_sample_list(request):
 
 @api_view(['POST'])
 def classify(request):
-    data = json.loads(request.body)
-    patient = Patient.objects.get(pk=data['patient_id'])
-    sample_id = data['sample_id']
-    organ_type = data['organ_type']
-    access_token = patient.access_token
-    
-    subject = "Your Medical Test Results"
-    message = f"Dear Patient,\n\nYour medical test results are now available. Please click the following link to view your results: http://localhost:5173/patients/{patient.id}/results/{sample_id}/{access_token}"
-    email_from = settings.EMAIL_HOST_USER
-    recipient_list = [patient.email]
-
-
-
-    send_mail(subject, message, email_from, recipient_list, fail_silently=False)
     try:
         data = json.loads(request.body)
-        if data is None:
-            return Response({"error": "data not provided"}, status=400)
-        result = classify_sample(sample_id, organ_type)
-        
-        # get patiend access token fro mdb 
-        # patient = Patient.objects.get(pk=data['patient_id'])
-        # sample_id = data['sample_id']
-        # access_token = patient.access_token
-        
-        # subject = "Your Medical Test Results"
-        # message = f"Dear Patient,\n\nYour medical test results are now available. Please click the following link to view your results: http://localhost:5173/patients/{patient.id}/results/{sample_id}/{access_token}"
-        # email_from = settings.EMAIL_HOST_USER
-        # recipient_list = ['wojteckiz8630@gmail.com']
-    
-        # send_mail(subject, message, email_from, recipient_list, fail_silently=False)
-        
-        return Response(result)
     except json.JSONDecodeError:
         return Response({"error": "Invalid JSON"}, status=400)
+
+    if not data:
+        return Response({"error": "data not provided"}, status=400)
+
+    try:
+        patient = Patient.objects.get(pk=data['patient_id'])
+        sample_id = data['sample_id']
+        organ_type = data['organ_type']
+        access_token = patient.access_token
+
+        subject = "Your Medical Test Results"
+        message = f"Dear Patient,\n\nYour medical test results are now available. Please click the following link to view your results: http://localhost:5173/patients/{patient.id}/results/{sample_id}/{access_token}"
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [patient.email]
+
+        send_mail(subject, message, email_from, recipient_list, fail_silently=False)
+
+        result = classify_sample(sample_id, organ_type)
+
+        return Response(result)
+    except Patient.DoesNotExist:
+        return Response({"error": "Patient not found"}, status=404)
     except Exception as e:
         print(e)
         return Response({"error": str(e)}, status=500)

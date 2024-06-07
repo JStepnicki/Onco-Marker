@@ -11,11 +11,13 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = UserModel
         fields = ('email', 'username')
+
 class DoctorSerializer(ModelSerializer):
     user = UserSerializer()
+
     class Meta:
         model = Doctor
-        fields = ('id', 'name', 'surname')
+        fields = ('id', 'name', 'surname', 'user')
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
