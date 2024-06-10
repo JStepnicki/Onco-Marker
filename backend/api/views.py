@@ -171,17 +171,9 @@ def get_patient_cancer_samples(request, pk):
         serializer = CancerSampleSerializer(patient.cancersample_set.all(), many=True)
         return Response(serializer.data)
 
-@api_view(['GET'])
-def get_all_cancer_samples(request):
-    if request.method == 'GET':
-        samples = CancerSample.objects.all()
-        serializer = CancerSampleSerializer(samples, many=True)
-        return Response(serializer.data)
 @api_view(['POST'])
 def add_patient_cancer_sample(request, pk):
     data = json.loads(request.body)
-    print(data)
-
     try:
         patient = Patient.objects.get(pk=pk)
     except Patient.DoesNotExist:
@@ -193,10 +185,15 @@ def add_patient_cancer_sample(request, pk):
     if serializer.is_valid():
         serializer.save(patient=patient)
         return Response(serializer.data, status=201)
-    print(serializer.errors)
     return Response(serializer.errors, status=400)
-    
 
+@api_view(['POST'])
+def add_cancer_sample(request):
+    serializer = CancerSampleSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
 
 @api_view(['DELETE'])
 def delete_cancer_sample(request, pk):
