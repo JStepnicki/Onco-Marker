@@ -1,6 +1,6 @@
-import React from 'react';
-import {Dialog, DialogContent, TextField, DialogActions, Button} from "@mui/material";
-import {createTheme, ThemeProvider} from '@mui/material/styles';
+import React, { useState } from 'react';
+import { Dialog, DialogContent, TextField, DialogActions, Button, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
     components: {
@@ -50,78 +50,54 @@ const theme = createTheme({
     },
 });
 
-function SampleDialog({open, handleClose, newSampleData, handleInputChange, handleAddSampleClick}) {
+const organMarkers = {
+    pancreas: ["plasma_CA19_9", "creatinine", "LYVE1", "REG1B", "TFF1", "REG1A"],
+    liver: ["cv_19", "afp"],
+    // Add other organs and their markers here
+};
+
+function SampleDialog({ open, handleClose, newSampleData, handleInputChange, handleAddSampleClick }) {
+    const [selectedOrgan, setSelectedOrgan] = useState("");
+
+    const handleOrganChange = (event) => {
+        setSelectedOrgan(event.target.value);
+        handleInputChange(event); // Update newSampleData with organ_type
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <Dialog open={open} onClose={handleClose}>
                 <DialogContent>
-                    <TextField
-                        margin="dense"
-                        name="organ_type"
-                        label="Organ Type"
-                        type="text"
-                        fullWidth
-                        value={newSampleData.organ_type}
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="plasma_CA19_9"
-                        label="Plasma CA19-9"
-                        type="number"
-                        fullWidth
-                        value={newSampleData.plasma_CA19_9}
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="creatinine"
-                        label="Creatinine"
-                        type="number"
-                        fullWidth
-                        value={newSampleData.creatinine}
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="LYVE1"
-                        label="LYVE1"
-                        type="number"
-                        fullWidth
-                        value={newSampleData.LYVE1}
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="REG1B"
-                        label="REG1B"
-                        type="number"
-                        fullWidth
-                        value={newSampleData.REG1B}
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="TFF1"
-                        label="TFF1"
-                        type="number"
-                        fullWidth
-                        value={newSampleData.TFF1}
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="REG1A"
-                        label="REG1A"
-                        type="number"
-                        fullWidth
-                        value={newSampleData.REG1A}
-                        onChange={handleInputChange}
-                    />
+                    <FormControl fullWidth margin="dense">
+                        <InputLabel>Organ Type</InputLabel>
+                        <Select
+                            value={newSampleData.organ_type}
+                            onChange={handleOrganChange}
+                            name="organ_type"
+                        >
+                            {Object.keys(organMarkers).map((organ) => (
+                                <MenuItem key={organ} value={organ}>
+                                    {organ}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    {selectedOrgan && organMarkers[selectedOrgan].map((marker) => (
+                        <TextField
+                            key={marker}
+                            margin="dense"
+                            name={marker}
+                            label={marker.replace("_", " ")}
+                            type="number"
+                            fullWidth
+                            value={newSampleData[marker] || ""}
+                            onChange={handleInputChange}
+                        />
+                    ))}
                 </DialogContent>
                 <DialogActions>
                     <Button
-                        onClick={() => setOpen(false)}
+                        onClick={handleClose}
                         sx={{
                             backgroundColor: '#333',
                             color: '#fff',
@@ -147,7 +123,6 @@ function SampleDialog({open, handleClose, newSampleData, handleInputChange, hand
                     >
                         Add
                     </Button>
-
                 </DialogActions>
             </Dialog>
         </ThemeProvider>
