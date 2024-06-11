@@ -31,8 +31,10 @@ const Sample = styled("div")({
 
 const organMarkers = {
     pancreas: ["plasma_CA19_9", "creatinine", "LYVE1", "REG1B", "TFF1", "REG1A"],
-    liver: ["cv_19", "afp"],
-    // Add other organs and their markers here
+    liver: ["ALT", "AST","ALP","Bilirubin","Gamma-glutamyltransferase","Albumin "],
+    leukemia: ["WBC", "RBC", "Hgb", "Hct", "MCV", "Platelets"],
+    breast: ["ER", "PR", "HER2", "Ki67", "EGFR", "P53"],
+    prostate: ["PSA", "PAP", "PSCA", "PSMA", "TMPRSS2", "ERG"],
 };
 
 function PatientPage() {
