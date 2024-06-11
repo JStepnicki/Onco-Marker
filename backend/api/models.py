@@ -1,8 +1,7 @@
 import uuid
-from django.db import models
 
-from django.contrib.auth.models import User, AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
+from django.db import models
 
 
 class Patient(models.Model):
@@ -12,12 +11,6 @@ class Patient(models.Model):
     age = models.IntegerField()
     sex = models.BooleanField()
     access_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-
-
-class Doctor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255, blank=True, null=True)
-    surname = models.CharField(max_length=255, blank=True, null=True)
 
 
 class CancerSample(models.Model):
