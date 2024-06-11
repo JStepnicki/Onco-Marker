@@ -1,5 +1,6 @@
 from api.models import Patient, CancerSample
 from django.contrib.auth import get_user_model, authenticate
+from django_rest_passwordreset.views import User
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
@@ -31,16 +32,25 @@ class UserRegisterSerializer(ModelSerializer):
         user.save()
         return user
 class UserLoginSerializer(ModelSerializer):
-    username = serializers.CharField()
     password = serializers.CharField()
+    email = serializers.EmailField()
     class Meta:
         model = UserModel
-        fields = ('username', 'password')
+        fields = ('password', 'email')
 
     def validate(self, data):
-        user = authenticate(username=data['username'], password=data['password'])
+        email = data.get('email')
+        password = data.get('password')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User with this email does not exist")
+
+        user = authenticate(username=user.username, password=password)
         if user and user.is_active:
             return user
+
         raise serializers.ValidationError("Incorrect Credentials")
 
 

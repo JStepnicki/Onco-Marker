@@ -86,13 +86,13 @@ function Register() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({username, password}),
+                body: JSON.stringify({email, password}),
             });
 
             if (!response.ok) {
                 throw new Error('Invalid username or password');
             }
-            sessionStorage.setItem('username', username);
+            sessionStorage.setItem('email', email);
             navigate('/doctors');
         } catch (error) {
             console.error('Error signing in:', error);
