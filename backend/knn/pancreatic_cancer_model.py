@@ -9,21 +9,18 @@ def classify_sample(sample_id, organ_type):
         sample_from_db = CancerSample.objects.get(id=sample_id)
         sample_markers_df = pd.json_normalize(sample_from_db.get_markers())
 
-        queryset = CancerSample.objects.filter(diagnosis__isnull=False)
+        queryset = CancerSample.objects.filter(diagnosis__isnull=False, organ_type=organ_type)
         if not queryset.exists():
             return {"error": "No samples available for training."}
 
         sample_df = pd.DataFrame(list(queryset.values()))
-
         markers_df = pd.json_normalize(sample_df['markers_JSON'])
 
         sample_df.drop(columns=["id", "timestamp", "organ_type", 'patient_id', 'benign_sample_diagnosis', 'markers_JSON', 'stage'], inplace=True)
         sample_df = pd.concat([sample_df, markers_df], axis=1)
         sample_df.fillna(0, inplace=True)
-
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(sample_df.drop(columns=["diagnosis"]))
-
         X_diagnosis = pd.DataFrame(X_scaled, columns=sample_df.columns[:-1])
         y_diagnosis = sample_df["diagnosis"]
 
