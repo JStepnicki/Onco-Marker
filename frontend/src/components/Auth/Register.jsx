@@ -10,7 +10,7 @@ function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-
+   const [confirmPassword, setConfirmPassword] = useState('');
     const theme = createTheme({
         components: {
             MuiInputLabel: {
@@ -63,6 +63,10 @@ function Register() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+                if (password !== confirmPassword) {
+            setError("Passwords don't match");
+            return;
+        }
 
         try {
             const response = await fetch('http://localhost:8000/api/register/', {
@@ -100,7 +104,7 @@ function Register() {
         }
     };
 
-    return (
+     return (
         <ThemeProvider theme={theme}>
             <Grid container justifyContent="center" alignItems="center" className="register-container">
                 <Box component="form" onSubmit={handleSubmit} className="register-form">
@@ -111,7 +115,7 @@ function Register() {
                         margin="normal"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        inputProps={{style: {fontSize: 20}}}
+                        inputProps={{ style: { fontSize: 20 } }}
                     />
                     <TextField
                         label="Email"
@@ -120,7 +124,7 @@ function Register() {
                         margin="normal"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        inputProps={{style: {fontSize: 20}}}
+                        inputProps={{ style: { fontSize: 20 } }}
                     />
                     <TextField
                         label="Password"
@@ -130,9 +134,19 @@ function Register() {
                         margin="normal"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        inputProps={{style: {fontSize: 20}}}
+                        inputProps={{ style: { fontSize: 20 } }}
                     />
-                    {error && <p style={{color: 'red'}}>{error}</p>}
+                    <TextField
+                        label="Confirm Password"
+                        variant="outlined"
+                        type="password"
+                        fullWidth
+                        margin="normal"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        inputProps={{ style: { fontSize: 20 } }}
+                    />
+                    {error && <p style={{ color: 'red' }}>{error}</p>}
                     <Button variant="contained" color="primary" type="submit" fullWidth>
                         Register
                     </Button>
