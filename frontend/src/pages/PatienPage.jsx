@@ -29,6 +29,14 @@ const Sample = styled("div")({
     width: "50%",
 });
 
+const organMarkers = {
+    pancreas: ["plasma_CA19_9", "creatinine", "LYVE1", "REG1B", "TFF1", "REG1A"],
+    liver: ["ALT", "AST","ALP","Bilirubin","Gamma-glutamyltransferase","Albumin "],
+    leukemia: ["WBC", "RBC", "Hgb", "Hct", "MCV", "Platelets"],
+    breast: ["ER", "PR", "HER2", "Ki67", "EGFR", "P53"],
+    prostate: ["PSA", "PAP", "PSCA", "PSMA", "TMPRSS2", "ERG"],
+};
+
 function PatientPage() {
     const [samplesData, setSamplesData] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -130,21 +138,19 @@ function PatientPage() {
     };
 
     const handleAddSampleClick = async () => {
-        const markers = {
-            plasma_CA19_9: newSampleData.plasma_CA19_9,
-            creatinine: newSampleData.creatinine,
-            LYVE1: newSampleData.LYVE1,
-            REG1B: newSampleData.REG1B,
-            TFF1: newSampleData.TFF1,
-            REG1A: newSampleData.REG1A,
-        };
+        const selectedOrganMarkers = organMarkers[newSampleData.organ_type] || [];
+        const markers = {};
 
-        const { plasma_CA19_9, creatinine, LYVE1, REG1B, TFF1, REG1A, ...rest } = newSampleData;
+        selectedOrganMarkers.forEach(marker => {
+            markers[marker] = newSampleData[marker] || "";
+        });
+
+        const { organ_type, ...rest } = newSampleData;
 
         const dataToSend = {
             ...rest,
             markers_JSON: markers,
-            organ_type: newSampleData.organ_type,
+            organ_type: organ_type,
         };
 
         try {
