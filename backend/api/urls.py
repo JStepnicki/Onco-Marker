@@ -21,6 +21,8 @@ urlpatterns = [
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
     path('user/', get_user, name='user'),
-    path('reset_password/', reset_password, name='reset_password'),
     path('patient/results/<uuid:access_token>/', patient_results, name='patient_results'),
+    path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+    path('password_reset/confirm/', include('django_rest_passwordreset.urls', namespace='password_reset_confirm')),
+    path('password_reset/validate_token/', include('django_rest_passwordreset.urls', namespace='password_reset_validate_token')),
 ]

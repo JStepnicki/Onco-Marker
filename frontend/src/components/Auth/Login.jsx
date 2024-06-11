@@ -1,12 +1,12 @@
-import React, {useState} from 'react';
-import {Button, TextField, Box, Link} from '@mui/material';
-import {createTheme, ThemeProvider} from '@mui/material/styles';
-import {useNavigate} from 'react-router-dom';
+import React, { useState } from 'react';
+import { Button, TextField, Box, Link } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
 function Login() {
     const navigate = useNavigate();
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const theme = createTheme({
@@ -67,28 +67,28 @@ function Login() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({username, password}),
+                body: JSON.stringify({ email, password }),
             });
 
             if (!response.ok) {
-                throw new Error('Invalid username or password');
+                throw new Error('Invalid email or password');
             }
-            sessionStorage.setItem('username', username);
+            sessionStorage.setItem('email', email);
             navigate('/doctors');
         } catch (error) {
             console.error('Error signing in:', error);
-            alert(error.message || 'Failed to sign in. Check your username and password.');
+            alert(error.message || 'Failed to sign in. Check your email and password.');
         }
     };
 
     const handleForgotPassword = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/reset_password/', {
+            const response = await fetch('http://localhost:8000/api/password_reset/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({username}),
+                body: JSON.stringify({ email }),
             });
 
             if (!response.ok) {
@@ -96,6 +96,8 @@ function Login() {
             }
 
             alert('Password reset email sent. Check your inbox!');
+            navigate('/password_reset/confirm');
+
         } catch (error) {
             console.error('Error sending reset email:', error);
             alert(error.message || 'Failed to send reset email. Check your email address.');
@@ -106,13 +108,13 @@ function Login() {
         <ThemeProvider theme={theme}>
             <Box component="form" onSubmit={handleSubmit} className="login-form">
                 <TextField
-                    label="Username"
+                    label="Email"
                     variant="outlined"
                     fullWidth
                     margin="normal"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    inputProps={{style: {fontSize: 20}}}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    inputProps={{ style: { fontSize: 20 } }}
                 />
                 <TextField
                     label="Password"
@@ -122,7 +124,7 @@ function Login() {
                     margin="normal"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    inputProps={{style: {fontSize: 20}}}
+                    inputProps={{ style: { fontSize: 20 } }}
                 />
                 <Button variant="contained" type="submit" fullWidth>
                     Login

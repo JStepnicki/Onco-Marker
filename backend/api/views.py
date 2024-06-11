@@ -247,5 +247,26 @@ def patient_results(request, access_token):
         # Return the serialized data
         return Response(serializer.data)
 
+from django.core.mail import EmailMultiAlternatives
+from django.dispatch import receiver
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django_rest_passwordreset.signals import reset_password_token_created
+@receiver(reset_password_token_created)
+def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
+    context = {
+        'username': reset_password_token.user.username,
+        'reset_password_token': reset_password_token.key
+    }
 
+    email_html_message = render_to_string('user_reset_password.html', context)
+    email_plaintext_message = render_to_string('user_reset_password.txt', context)
 
+    msg = EmailMultiAlternatives(
+        "Resetowanie hasła",
+        email_plaintext_message,
+        "noreply@example.com",
+        [reset_password_token.user.email]
+    )
+    msg.attach_alternative(email_html_message, "text/html")
+    msg.send()

@@ -3,8 +3,8 @@ import PatientList from '../components/PatientList/PatientList';
 
 
 function DoctorPage() {
-    const username = sessionStorage.getItem('username');
-    if (!username) {
+    const email = sessionStorage.getItem('email');
+    if (!email) {
         alert('You must be logged in to view this page');
         window.location.href = '/';
         return null;
