@@ -57,7 +57,7 @@ def classify_sample(sample_id, organ_type):
             X_stage = pd.DataFrame(X_stage_scaled, columns=sample_df_second.columns[:-1])
             y_stage = sample_df_second["stage"]
 
-            knn_stage = KNeighborsClassifier(n_neighbors=4)
+            knn_stage = KNeighborsClassifier(n_neighbors=3)
             knn_stage.fit(X_stage, y_stage)
 
             sample_markers_np_scaled_stage = scaler.transform([sample_markers_np])
