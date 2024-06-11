@@ -17,7 +17,6 @@ urlpatterns = [
     path('patients/cancer_samples/update/<int:pk>/', update_cancer_sample, name='update-cancer-sample'),
     path('cancer_saples_add/', add_cancer_sample, name='add-cancer-sample'),
     path('classify/', classify, name='classify'),
-    path('add_doctor/', add_doctor, name='add-doctor'),
     path('register/', register, name='register'),
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),

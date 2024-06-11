@@ -14,12 +14,6 @@ class Patient(models.Model):
     access_token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
 
-class Doctor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255, blank=True, null=True)
-    surname = models.CharField(max_length=255, blank=True, null=True)
-
-
 class CancerSample(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, blank=True)
     organ_type = models.CharField(max_length=255, default='pancreas')

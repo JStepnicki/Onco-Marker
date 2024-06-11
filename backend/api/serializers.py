@@ -3,7 +3,7 @@ from django.forms import UUIDField
 from rest_framework.serializers import ModelSerializer
 from django.contrib.auth.models import User
 
-from api.models import Doctor, Patient, CancerSample
+from api.models import Patient, CancerSample
 from django.contrib.auth import get_user_model, authenticate
 
 UserModel = get_user_model()
@@ -11,20 +11,6 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = UserModel
         fields = ('email', 'username')
-class DoctorSerializer(ModelSerializer):
-    user = UserSerializer()
-    class Meta:
-        model = Doctor
-        fields = ('id', 'name', 'surname')
-
-    def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user = User.objects.create_user(**user_data)
-        doctor = Doctor.objects.create(user=user, **validated_data)
-        return doctor
-
-
-
 
 class PatientSerializer(ModelSerializer):
     class Meta:
