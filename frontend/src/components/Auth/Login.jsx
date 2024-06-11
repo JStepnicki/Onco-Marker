@@ -83,7 +83,7 @@ function Login() {
 
     const handleForgotPassword = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/reset_password/', {
+            const response = await fetch('http://localhost:8000/api/password_reset/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -96,6 +96,8 @@ function Login() {
             }
 
             alert('Password reset email sent. Check your inbox!');
+            navigate('/password_reset/confirm');
+
         } catch (error) {
             console.error('Error sending reset email:', error);
             alert(error.message || 'Failed to send reset email. Check your email address.');

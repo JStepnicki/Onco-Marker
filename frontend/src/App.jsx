@@ -7,6 +7,7 @@ import Register from './components/Auth/Register';
 import PatientPage from './pages/PatienPage';
 import ResultsPage from './pages/ResultsPage';
 import ErrorPage from './pages/ErrorPage';
+import PasswordResetConfirm from './pages/PasswordResetConfirm';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
             <Route path='/patients/:id' element={<PatientPage/>}/>
             <Route path='/patients/:id/results' element={<ResultsPage/>}/>
             <Route path='/patients/:id/results/:sampleId/:accessToken' element={<ResultsPage/>}/>
+              <Route path="/password_reset/confirm" element={<PasswordResetConfirm />} />
             <Route path='/error' element={<ErrorPage/>}/>
           </Routes>
         </Router>
