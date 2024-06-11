@@ -21,7 +21,7 @@ class Doctor(models.Model):
 
 
 class CancerSample(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, blank=True)
     organ_type = models.CharField(max_length=255, default='pancreas')
     stage = models.CharField(max_length=255, blank=True, null=True)
     benign_sample_diagnosis = models.CharField(max_length=255, blank=True, null=True)
