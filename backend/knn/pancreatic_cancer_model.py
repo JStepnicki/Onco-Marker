@@ -1,7 +1,7 @@
 import pandas as pd
+from api.models import CancerSample
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from api.models import CancerSample
 
 
 def classify_sample(sample_id, organ_type):
