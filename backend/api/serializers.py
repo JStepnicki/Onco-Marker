@@ -1,10 +1,7 @@
-from rest_framework import serializers
-from django.forms import UUIDField
-from rest_framework.serializers import ModelSerializer
-from django.contrib.auth.models import User
-
 from api.models import Patient, CancerSample
 from django.contrib.auth import get_user_model, authenticate
+from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 UserModel = get_user_model()
 class UserSerializer(ModelSerializer):

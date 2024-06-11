@@ -1,22 +1,19 @@
-from email.message import EmailMessage
 import json
 
-from rest_framework.exceptions import NotFound
+from api.models import Patient, CancerSample
+from api.serializers import PatientSerializer, CancerSampleSerializer, UserSerializer, UserRegisterSerializer, UserLoginSerializer
+from django.conf import settings
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from knn.pancreatic_cancer_model import classify_sample
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_200_OK
-from rest_framework.viewsets import ModelViewSet
-from django.http import JsonResponse
-from django.contrib.auth import get_user_model, authenticate, login, logout
-from api.models import  Patient, CancerSample
-from api.serializers import  PatientSerializer, CancerSampleSerializer, UserSerializer, UserRegisterSerializer, UserLoginSerializer
-from django.conf import settings
-from knn.pancreatic_cancer_model import classify_sample
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.forms import PasswordResetForm
-from django.core.mail import send_mail
-from django.urls import reverse
 
 
 @api_view(['GET'])
@@ -72,7 +69,6 @@ def update_patient(request, pk):
 
 @api_view(['PUT'])
 def update_cancer_sample(request, pk):
-    print(request.body)
     try:
         sample = CancerSample.objects.get(pk=pk)
     except CancerSample.DoesNotExist:

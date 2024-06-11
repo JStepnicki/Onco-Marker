@@ -1,6 +1,8 @@
 import csv
-from django.core.management.base import BaseCommand
+
 from api.models import CancerSample
+from django.core.management.base import BaseCommand
+
 
 class Command(BaseCommand):
     help = 'Import data from CSV file into CancerSample model'
