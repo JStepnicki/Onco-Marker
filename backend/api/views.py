@@ -1,5 +1,4 @@
 import json
-
 from api.models import Patient, CancerSample
 from api.serializers import PatientSerializer, CancerSampleSerializer, UserSerializer, UserRegisterSerializer, UserLoginSerializer
 from django.conf import settings
@@ -9,25 +8,29 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django_rest_passwordreset.views import User
 from knn.pancreatic_cancer_model import classify_sample
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_200_OK
+from django.core.mail import EmailMultiAlternatives
+from django.dispatch import receiver
+from django.template.loader import render_to_string
+from django_rest_passwordreset.signals import reset_password_token_created
 
 
 @api_view(['GET'])
 def patient_list(request):
     if request.method == 'GET':
-        
+
         access_token = request.query_params.get('access_token')
 
         if access_token:
             patient = get_object_or_404(Patient, access_token=access_token)
             serializer = PatientSerializer(patient)
             return Response(serializer.data)
-        
-        
+
         patients = Patient.objects.all()
         serializer = PatientSerializer(patients, many=True)
         return Response(serializer.data)
@@ -83,20 +86,12 @@ def update_cancer_sample(request, pk):
     print(serializer.errors)
     return Response(serializer.errors, status=400)
 
+
 @api_view(['GET'])
 def cancer_sample_list(request):
-    if request.method == 'GET':
-        sample_id = request.query_params.get('sample_id')
-        if sample_id is not None:
-            try:
-                cancer_sample = CancerSample.objects.get(id=sample_id)
-            except CancerSample.DoesNotExist:
-                raise NotFound('A cancer sample with this ID does not exist.')
-            serializer = CancerSampleSerializer(cancer_sample)
-        else:
-            cancer_samples = CancerSample.objects.all()
-            serializer = CancerSampleSerializer(cancer_samples, many=True)
-        return Response(serializer.data)
+    cancer_samples = CancerSample.objects.all()
+    serializer = CancerSampleSerializer(cancer_samples, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -136,6 +131,7 @@ def classify(request):
         print(e)
         return Response({"error": str(e)}, status=500)
 
+
 @api_view(['GET'])
 def get_patient_cancer_samples(request, pk):
     if request.method == 'GET':
@@ -146,6 +142,7 @@ def get_patient_cancer_samples(request, pk):
         serializer = CancerSampleSerializer(patient.cancersample_set.all(), many=True)
         return Response(serializer.data)
 
+
 @api_view(['POST'])
 def add_patient_cancer_sample(request, pk):
     data = json.loads(request.body)
@@ -153,7 +150,7 @@ def add_patient_cancer_sample(request, pk):
         patient = Patient.objects.get(pk=pk)
     except Patient.DoesNotExist:
         return Response(status=404)
-    
+
     data['patient'] = patient.id
 
     serializer = CancerSampleSerializer(data=data)
@@ -162,6 +159,7 @@ def add_patient_cancer_sample(request, pk):
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
 
+
 @api_view(['POST'])
 def add_cancer_sample(request):
     serializer = CancerSampleSerializer(data=request.data)
@@ -169,6 +167,7 @@ def add_cancer_sample(request):
         serializer.save()
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
+
 
 @api_view(['DELETE'])
 def delete_cancer_sample(request, pk):
@@ -180,15 +179,20 @@ def delete_cancer_sample(request, pk):
     sample.delete()
     return Response(status=204)
 
+
 @api_view(['POST'])
 def register(request):
     data = request.data
     serializer = UserRegisterSerializer(data=data)
+    email = data.get('email')
+    if email and User.objects.filter(email=email).exists():
+        return Response({'error': 'User with this email already exists'}, status=HTTP_400_BAD_REQUEST)
     if serializer.is_valid(raise_exception=True):
         user = serializer.create(data)
         if user:
             return Response(serializer.data, status=HTTP_201_CREATED)
         return Response(status=HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def user_login(request):
@@ -201,10 +205,12 @@ def user_login(request):
             return Response(serializer.data, status=HTTP_201_CREATED)
         return Response(status=HTTP_401_UNAUTHORIZED)
 
+
 @api_view(['POST'])
 def user_logout(request):
     logout(request)
     return Response(status=HTTP_200_OK)
+
 
 @api_view(['GET'])
 def get_user(request):
@@ -230,28 +236,24 @@ def reset_password(request):
         return JsonResponse({'message': 'Password reset email has been sent. Please check your inbox.'})
     else:
         return JsonResponse({'error': 'Invalid email address'}, status=400)
-    
-    
+
+
 @api_view(['GET'])
 def patient_results(request, access_token):
     if request.method == 'GET':
         # Retrieve the patient using the access token
         patient = get_object_or_404(Patient, access_token=access_token)
-        
+
         # Query the patient's cancer samples
         cancer_samples = patient.cancersample_set.all()
-        
+
         # Serialize the data
         serializer = CancerSampleSerializer(cancer_samples, many=True)
-        
+
         # Return the serialized data
         return Response(serializer.data)
 
-from django.core.mail import EmailMultiAlternatives
-from django.dispatch import receiver
-from django.template.loader import render_to_string
-from django.urls import reverse
-from django_rest_passwordreset.signals import reset_password_token_created
+
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
     context = {
@@ -270,3 +272,8 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     )
     msg.attach_alternative(email_html_message, "text/html")
     msg.send()
+@api_view(['GET'])
+def get_all_users(request):
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)

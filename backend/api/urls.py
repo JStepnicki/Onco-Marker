@@ -25,4 +25,5 @@ urlpatterns = [
     path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path('password_reset/confirm/', include('django_rest_passwordreset.urls', namespace='password_reset_confirm')),
     path('password_reset/validate_token/', include('django_rest_passwordreset.urls', namespace='password_reset_validate_token')),
+    path('users/', get_all_users, name='get_all_users'),
 ]
