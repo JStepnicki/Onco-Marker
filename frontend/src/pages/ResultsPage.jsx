@@ -4,12 +4,24 @@ import {Typography, Card, CardContent, Box, Container, Grid, CardHeader} from "@
 import {useState, useEffect} from "react";
 import axios from "axios";
 import PancreasIcon from "../components/Icons/Pancreas.jsx";
+import LiverIcon from "../components/Icons/Liver.jsx";
+import BreastIcon from "../components/Icons/Breast.jsx";
+import ProstateIcon from "../components/Icons/Prostate.jsx";
+import LeukemiaIcon from "../components/Icons/Leukemia.jsx";
 
 function ResultsPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const [patient, setPatient] = useState([]);
     const [sample, setSample] = useState({});
+
+    const organIcons = {
+        pancreas: <PancreasIcon />,
+        liver: <LiverIcon />,
+        breast: <BreastIcon />,
+        prostate: <ProstateIcon />,
+        leukemia: <LeukemiaIcon />,
+    };
 
     useEffect(() => {
         if (location.state?.sample) {
@@ -110,7 +122,11 @@ function ResultsPage() {
                                         <Typography variant="body2">{`Timestamp: ${new Date(sample.timestamp).toLocaleString()}`}</Typography>
                                     </>
                                 }
-                                action={<PancreasIcon />}
+                                action={
+                                    <Box sx={{ position: 'relative', top: 8, right: 8 }}>
+                                        {organIcons[sample.organ_type]}
+                                    </Box>
+                                }
                                 sx={{ backgroundColor: '#f5f5f5', padding: '8px' }}
                             />
                             <CardContent sx={{ padding: '16px' }}>
