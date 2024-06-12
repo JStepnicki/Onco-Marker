@@ -130,7 +130,6 @@ function ResultsPage() {
                                 sx={{ backgroundColor: '#f5f5f5', padding: '8px' }}
                             />
                             <CardContent sx={{ padding: '16px' }}>
-                                <Typography variant="body2">Markers: </Typography>
                                 {sample.markers_JSON &&
                                     Object.entries(sample.markers_JSON).map(
                                         ([key, value]) =>
