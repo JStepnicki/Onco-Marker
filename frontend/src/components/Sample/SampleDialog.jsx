@@ -76,6 +76,7 @@ function SampleDialog({ open, handleClose, newSampleData, handleInputChange, han
                             value={newSampleData.organ_type}
                             onChange={handleOrganChange}
                             name="organ_type"
+                            sx={{ minWidth: 500 }}
                         >
                             {Object.keys(organMarkers).map((organ) => (
                                 <MenuItem key={organ} value={organ}>

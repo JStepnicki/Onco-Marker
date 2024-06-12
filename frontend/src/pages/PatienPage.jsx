@@ -4,6 +4,11 @@ import TopBar from "../components/Header/TopBar.jsx";
 import DeleteIcon from '../components/Icons/Delete';
 import ProfileIcon from '../components/Icons/Profile';
 import PancreasIcon from "../components/Icons/Pancreas.jsx";
+import LiverIcon from "../components/Icons/Liver.jsx";
+import BreastIcon from "../components/Icons/Breast.jsx";
+import ProstateIcon from "../components/Icons/Prostate.jsx";
+import LeukemiaIcon from "../components/Icons/Leukemia.jsx";
+import BloodSampleIcon from "../components/Icons/BloodSample.jsx";
 import axios from "axios";
 import {
     Typography,
@@ -28,6 +33,14 @@ const Sample = styled("div")({
     padding: "8px",
     width: "50%",
 });
+
+const organIcons = {
+    pancreas: <PancreasIcon />,
+    liver: <LiverIcon />,
+    breast: <BreastIcon />,
+    prostate: <ProstateIcon />,
+    leukemia: <LeukemiaIcon />,
+};
 
 const organMarkers = {
     pancreas: ["plasma_CA19_9", "creatinine", "LYVE1", "REG1B", "TFF1", "REG1A"],
@@ -196,9 +209,18 @@ function PatientPage() {
                         <Grid item xs={12} sm={6} md={4} lg={4} key={sample.id}>
                             <Card sx={{ marginBottom: '4px', height: '100%' }}>
                                 <CardHeader
-                                    title={`Sample ID: ${sample.id}`}
-                                    subheader={`Timestamp: ${new Date(sample.timestamp).toLocaleString()}`}
-                                    action={<PancreasIcon onClick={() => handleDeleteClick(sample.id)} />}
+                                    title={`Organ: ${sample.organ_type}`}
+                                    subheader={
+                                        <>
+                                            <Typography variant="body2">{`Sample ID: ${sample.id}`}</Typography>
+                                            <Typography variant="body2">{`Timestamp: ${new Date(sample.timestamp).toLocaleString()}`}</Typography>
+                                        </>
+                                    }
+                                    action={
+                                        <Box sx={{ position: 'relative', top: 8, right: 8 }}>
+                                            {organIcons[sample.organ_type]}
+                                        </Box>
+                                    }
                                     sx={{ backgroundColor: '#f5f5f5', padding: '8px' }}
                                 />
                                 <CardContent sx={{ padding: '16px' }}>
@@ -217,7 +239,7 @@ function PatientPage() {
                                     </Typography>
                                 </CardContent>
                                 <CardActions sx={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px' }}>
-                                    <ProfileIcon onClick={() => handleKnnClick(sample)} />
+                                    <BloodSampleIcon onClick={() => handleKnnClick(sample)} />
                                     <DeleteIcon onClick={() => handleDeleteClick(sample.id)} />
                                 </CardActions>
                             </Card>

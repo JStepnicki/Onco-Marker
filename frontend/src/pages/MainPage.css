@@ -1,6 +1,6 @@
 .main-page {
     width: 400px;
-    margin: 10em auto;
+    margin: 5em auto 10em; /* Adjust the top margin here */
     margin-right: 10em;
     border-radius: 1.5em;
     padding: 2em;
