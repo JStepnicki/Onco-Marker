@@ -196,9 +196,14 @@ function PatientPage() {
                         <Grid item xs={12} sm={6} md={4} lg={4} key={sample.id}>
                             <Card sx={{ marginBottom: '4px', height: '100%' }}>
                                 <CardHeader
-                                    title={`Sample ID: ${sample.id}`}
-                                    subheader={`Timestamp: ${new Date(sample.timestamp).toLocaleString()}`}
-                                    action={<PancreasIcon onClick={() => handleDeleteClick(sample.id)} />}
+                                    title={`Organ: ${sample.organ_type}`}
+                                    subheader={
+                                        <>
+                                            <Typography variant="body2">{`Sample ID: ${sample.id}`}</Typography>
+                                            <Typography variant="body2">{`Timestamp: ${new Date(sample.timestamp).toLocaleString()}`}</Typography>
+                                        </>
+                                    }
+                                    action={<PancreasIcon />}
                                     sx={{ backgroundColor: '#f5f5f5', padding: '8px' }}
                                 />
                                 <CardContent sx={{ padding: '16px' }}>
