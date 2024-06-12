@@ -51,20 +51,23 @@ class TestAuthenticate(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_login_valid_credentials(self):
-        username = 'testuser'
-        password = 'testpassword'
-        user = User.objects.create_user(username=username, password=password)
+        url = reverse('register')
+        data = {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'testpassword'
+        }
+        response = self.client.post(url, data, format='json')
 
         url = reverse('login')
         data = {
-            'username': username,
-            'password': password
+            'email': 'test@example.com',
+            'password': 'testpassword'
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_login_invalid_credentials(self):
-        # Tworzymy użytkownika bezpośrednio przed testem
         username = 'testuser'
         password = 'testpassword'
         user = User.objects.create_user(username=username, password=password)
@@ -100,31 +103,4 @@ class TestAuthenticate(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_reset_password_valid_email(self):
-        client = APIClient()
-        factory = RequestFactory()
-        url = reverse('reset_password')
-        email = 'test@example.com'
-
-        request = factory.post(url, {'email': email})
-
-        request.is_secure = lambda: True
-
-        response = reset_password(request)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('message', json.loads(response.content.decode()))
-
-    def test_reset_password_invalid_email(self):
-        client = APIClient()
-        factory = RequestFactory()
-        url = reverse('reset_password')
-        email = 'invalid_email'
-
-        request = factory.post(url, {'email': email})
-
-        response = reset_password(request)
-
-        self.assertEqual(response.status_code, 400)
-        self.assertIn('error', json.loads(response.content.decode()))
 

@@ -277,3 +277,12 @@ def get_all_users(request):
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def get_cancer_sample(request, pk):
+    try:
+        sample = CancerSample.objects.get(pk=pk)
+    except CancerSample.DoesNotExist:
+        return Response(status=404)
+    serializer = CancerSampleSerializer(sample)
+    return Response(serializer.data)

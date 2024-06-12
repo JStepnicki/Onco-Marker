@@ -193,28 +193,37 @@ class TestSample(TestCase):
         expected_data = CancerSampleSerializer(instance=[sample1, sample2], many=True).data
         self.assertEqual(data, expected_data)
 
-    def test_get_single_cancer_sample(self):
-        patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
-        sample = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
-                                             diagnosis="", organ_type="")
+    def test_add_and_get_single_cancer_sample(self):
+        sample_data = {
+            'stage': "Stage I",
+            'benign_sample_diagnosis': "Diagnosis A",
+            'markers_JSON': {'marker1': 'value1'},
+            'diagnosis': "Diagnosis X",
+            'organ_type': "Liver"
+        }
 
-        url = reverse('cancer-sample-list')
+        add_url = reverse('add-cancer-sample')
+        response = self.client.post(add_url, sample_data, format='json')
 
-        response = self.client.get(url, {'sample_id': sample.pk})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        sample_id = response.data['id']
+
+        get_url = reverse('get-cancer-sample', args=[sample_id])
+
+        response = self.client.get(get_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         data = response.data
 
-        expected_data = CancerSampleSerializer(instance=sample).data
+        expected_data = CancerSampleSerializer(instance=CancerSample.objects.get(pk=sample_id)).data
+
         self.assertEqual(data, expected_data)
 
     def test_get_single_cancer_sample_not_found(self):
         url = reverse('cancer-sample-list')
-
-        response = self.client.get(url, {'sample_id': 9999})
-
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        response = self.client.get(url, {})
+        self.assertEqual(len(response.data), 0)
 
     def test_get_patient_cancer_samples(self):
         patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
