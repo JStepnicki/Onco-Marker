@@ -1,10 +1,6 @@
-import json
-
 from api.models import Patient, CancerSample
-from api.views import reset_password
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.test.client import RequestFactory
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -19,7 +15,6 @@ class TestAuthenticate(TestCase):
     def tearDown(self):
         Patient.objects.all().delete()
         CancerSample.objects.all().delete()
-
 
     def test_register_valid_data(self):
         url = reverse('register')
@@ -40,6 +35,7 @@ class TestAuthenticate(TestCase):
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_register_valid_data(self):
         url = reverse('register')
         data = {
@@ -102,5 +98,3 @@ class TestAuthenticate(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-

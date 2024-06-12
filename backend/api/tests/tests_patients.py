@@ -98,38 +98,38 @@ class TestPatientViews(TestCase):
         self.assertEqual(updated_patient.email, 'jane.smith@example.com')
 
     def test_patient_list_without_access_token(self):
-            patient1 = Patient.objects.create(name='John', surname='Doe', age=30, sex=1, email='john.doe@example.com')
-            patient2 = Patient.objects.create(name='Jane', surname='Smith', age=35, sex=0,
-                                              email='jane.smith@example.com')
+        patient1 = Patient.objects.create(name='John', surname='Doe', age=30, sex=1, email='john.doe@example.com')
+        patient2 = Patient.objects.create(name='Jane', surname='Smith', age=35, sex=0,
+                                          email='jane.smith@example.com')
 
-            response = self.client.get(self.patient_list_url)
+        response = self.client.get(self.patient_list_url)
 
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-            response_data = response.json()
-            self.assertEqual(len(response_data), 2)
-            self.assertEqual(response_data[0]['name'], 'John')
-            self.assertEqual(response_data[1]['name'], 'Jane')
+        response_data = response.json()
+        self.assertEqual(len(response_data), 2)
+        self.assertEqual(response_data[0]['name'], 'John')
+        self.assertEqual(response_data[1]['name'], 'Jane')
 
     def test_patient_list_with_access_token(self):
-            patient = Patient.objects.create(name='John', surname='Doe', age=30, sex=1, email='john.doe@example.com')
+        patient = Patient.objects.create(name='John', surname='Doe', age=30, sex=1, email='john.doe@example.com')
 
-            access_token = uuid.uuid4()
-            patient.access_token = access_token
-            patient.save()
+        access_token = uuid.uuid4()
+        patient.access_token = access_token
+        patient.save()
 
-            patient_list_with_token_url = f"{self.patient_list_url}?access_token={access_token}"
+        patient_list_with_token_url = f"{self.patient_list_url}?access_token={access_token}"
 
-            response = self.client.get(patient_list_with_token_url)
+        response = self.client.get(patient_list_with_token_url)
 
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-            response_data = response.json()
-            self.assertEqual(response_data['name'], 'John')
-            self.assertEqual(response_data['surname'], 'Doe')
-            self.assertEqual(response_data['age'], 30)
-            self.assertEqual(response_data['sex'], 1)
-            self.assertEqual(response_data['email'], 'john.doe@example.com')
+        response_data = response.json()
+        self.assertEqual(response_data['name'], 'John')
+        self.assertEqual(response_data['surname'], 'Doe')
+        self.assertEqual(response_data['age'], 30)
+        self.assertEqual(response_data['sex'], 1)
+        self.assertEqual(response_data['email'], 'john.doe@example.com')
 
     def test_patient_results(self):
         access_token = uuid.uuid4()
@@ -156,8 +156,3 @@ class TestPatientViews(TestCase):
         expected_data = CancerSampleSerializer(instance=[sample1, sample2], many=True).data
 
         self.assertEqual(data, expected_data)
-
-
-
-
-

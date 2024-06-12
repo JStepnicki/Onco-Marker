@@ -11,7 +11,7 @@ class TestClassifySample(TestCase):
         cls.sample1 = CancerSample.objects.create(
             diagnosis="1",
             organ_type="test",
-            stage = None,
+            stage=None,
             markers_JSON={
                 "marker1": 1.0,
                 "marker2": 2.0
@@ -30,7 +30,7 @@ class TestClassifySample(TestCase):
 
         cls.sample3 = CancerSample.objects.create(
             diagnosis="3",
-            stage= "IIIB",
+            stage="IIIB",
             organ_type="test",
             markers_JSON={
                 "marker1": 3.0,
@@ -112,4 +112,4 @@ class TestClassifySample(TestCase):
         mock_get.return_value = self.sample3
         y_pred, stage_pred = classify_sample(self.sample3.id, "test")
         self.assertEqual(y_pred, "3")
-        self.assertEqual(stage_pred,"IIIB")
+        self.assertEqual(stage_pred, "IIIB")

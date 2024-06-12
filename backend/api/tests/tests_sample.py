@@ -18,7 +18,6 @@ class TestSample(TestCase):
         Patient.objects.all().delete()
         CancerSample.objects.all().delete()
 
-
     def test_add_patient_cancer_sample(self):
         patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
 
@@ -57,7 +56,6 @@ class TestSample(TestCase):
         self.assertEqual(cancer_sample.markers_JSON["REG1B"], 52.94884)
         self.assertEqual(cancer_sample.markers_JSON["TFF1"], 654.282174)
         self.assertEqual(cancer_sample.markers_JSON["REG1A"], 1262)
-
 
     def test_add_patient_cancer_sample_patient_not_found(self):
         non_existent_patient_id = 99999
@@ -266,10 +264,3 @@ class TestSample(TestCase):
 
         expected_data = CancerSampleSerializer(instance=[sample1, sample2], many=True).data
         self.assertEqual(data, expected_data)
-
-
-
-
-
-
-
