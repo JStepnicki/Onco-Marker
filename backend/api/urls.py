@@ -1,4 +1,10 @@
-from api.views import *
+from api.views.auth_views import *
+from api.views.debug_views import *
+from api.views.patients_view import *
+from api.views.result_views import *
+from api.views.knn_views import *
+from api.views.patients_samples_views import *
+
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 

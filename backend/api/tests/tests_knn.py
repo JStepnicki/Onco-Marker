@@ -94,20 +94,20 @@ class TestClassifySample(TestCase):
             }
         )
 
-    @patch('api.views.CancerSample.objects.get')
+    @patch('api.models.CancerSample.objects.get')
     def test_classify_sample_existing_sample(self, mock_get):
         mock_get.return_value = self.sample1
         y_pred, stage_pred = classify_sample(self.sample1.id, "test")
         self.assertEqual(y_pred, "1")
         self.assertIsNone(stage_pred)
 
-    @patch('api.views.CancerSample.objects.get')
+    @patch('api.models.CancerSample.objects.get')
     def test_classify_sample_missing_sample(self, mock_get):
         mock_get.side_effect = CancerSample.DoesNotExist
         result = classify_sample(999, "test")
         self.assertIn("error", result)
 
-    @patch('api.views.CancerSample.objects.get')
+    @patch('api.models.CancerSample.objects.get')
     def test_classify_sample_diagnosis_3(self, mock_get):
         mock_get.return_value = self.sample3
         y_pred, stage_pred = classify_sample(self.sample3.id, "test")
