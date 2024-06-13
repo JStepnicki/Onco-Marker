@@ -125,11 +125,13 @@ class TestPatientViews(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         response_data = response.json()
-        self.assertEqual(response_data['name'], 'John')
-        self.assertEqual(response_data['surname'], 'Doe')
-        self.assertEqual(response_data['age'], 30)
-        self.assertEqual(response_data['sex'], 1)
-        self.assertEqual(response_data['email'], 'john.doe@example.com')
+
+        patient_data = response_data[0]
+        self.assertEqual(patient_data['name'], 'John')
+        self.assertEqual(patient_data['surname'], 'Doe')
+        self.assertEqual(patient_data['age'], 30)
+        self.assertEqual(patient_data['sex'], True)
+        self.assertEqual(patient_data['email'], 'john.doe@example.com')
 
     def test_patient_results(self):
         access_token = uuid.uuid4()
