@@ -4,7 +4,7 @@ from api.views.patients_view import *
 from api.views.result_views import *
 from api.views.knn_views import *
 from api.views.patients_samples_views import *
-
+from api.views.plot_views import *
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
@@ -49,4 +49,6 @@ urlpatterns = [
     path('cancer_sample/<int:pk>/', get_cancer_sample, name='get-cancer-sample'),
     path('cancer_samples/', cancer_sample_list, name='cancer-sample-list'),
     path('cancer_saples_add/', add_cancer_sample, name='add-cancer-sample'), # for adding cancer samples without patient
+
+    path('plot', radar_chart_view, name='radar-chart')
 ]
