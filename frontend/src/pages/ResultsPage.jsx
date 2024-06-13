@@ -15,6 +15,7 @@ function ResultsPage() {
     const [patient, setPatient] = useState([]);
     const [samples, setSamples] = useState([]);
     const [sample, setSample] = useState({});
+    const [radarChart, setRadarChart] = useState(null);
 
     const organIcons = {
         pancreas: <PancreasIcon/>,
@@ -75,6 +76,51 @@ function ResultsPage() {
         }
     }, []);
 
+
+    useEffect(() => {
+        const fetchRadarChart = async () => {
+
+            if (location.state?.sample) {
+                try {
+                    const response = await axios.get(
+                        `${import.meta.env.VITE_API_URL}plot/${location.state.sample.id}/`,
+                        {responseType: 'json'}
+                    );
+                    const plotData = `data:image/png;base64,${response.data.plot}`;
+                    setRadarChart(plotData);
+                } catch (error) {
+                    navigate("/error", {
+                        state: {
+                            status: error.response?.status || 500,
+                            message: error.message,
+                        },
+                    });
+                }
+            } else {
+                try {
+                    const urlParts = window.location.pathname.split("/");
+                    const sampleId = parseInt(urlParts[urlParts.length - 2], 10);
+                    const response = await axios.get(
+                        `${import.meta.env.VITE_API_URL}plot/${sampleId}/`,
+                        {responseType: 'json'}
+                    );
+                    const plotData = `data:image/png;base64,${response.data.plot}`;
+                    setRadarChart(plotData);
+                } catch (error) {
+                    navigate("/error", {
+                        state: {
+                            status: error.response?.status || 500,
+                            message: error.message,
+                        },
+                    });
+                }
+            }
+
+        };
+
+        fetchRadarChart();
+    }, []);
+
     console.log(sample);
     let diagnosis = "";
     switch (sample.diagnosis) {
@@ -100,7 +146,7 @@ function ResultsPage() {
                             <CardContent>
                                 <Typography variant="h5" gutterBottom>Diagnosis Results</Typography>
                                 <Typography variant="body1">{diagnosis}</Typography>
-                                {sample.diagnosis > 1 && (
+                                {sample.diagnosis === "3" && (
                                     <Typography variant="body1">Stage: {sample.stage}</Typography>
                                 )}
                             </CardContent>
@@ -124,17 +170,31 @@ function ResultsPage() {
                                 }
                                 sx={{backgroundColor: '#f5f5f5', padding: '8px'}}
                             />
-                            <CardContent sx={{padding: '16px'}}>
-                                {sample.markers_JSON &&
-                                    Object.entries(sample.markers_JSON).map(
-                                        ([key, value]) =>
-                                            value && (
-                                                <Typography
-                                                    key={key}
-                                                    variant="body2"
-                                                >{`${key}: ${value}`}</Typography>
-                                            )
-                                    )}
+                            <CardContent sx={{ padding: '16px' }}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={6}>
+                                        {sample.markers_JSON &&
+                                            Object.entries(sample.markers_JSON).map(
+                                                ([key, value]) =>
+                                                    value && (
+                                                        <Typography
+                                                            key={key}
+                                                            variant="body2"
+                                                        >{`${key}: ${value}`}</Typography>
+                                                    )
+                                            )}
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        {radarChart && (
+                                            <Box
+                                                component="img"
+                                                src={radarChart}
+                                                alt="Radar Chart"
+                                                sx={{ width: '80%', height: 'auto' }}  // Adjusted size to 80%
+                                            />
+                                        )}
+                                    </Grid>
+                                </Grid>
                             </CardContent>
                         </Card>
                     </Grid>

@@ -1,17 +1,16 @@
-import matplotlib
-import matplotlib.pyplot as plt
+import io
+import base64
 import numpy as np
-from api.models import CancerSample
+import matplotlib.pyplot as plt
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from api.models import CancerSample
+import matplotlib
 
+@api_view(['GET'])
+def radar_chart_view(request, sample_id):
 
-@api_view(['POST'])
-def radar_chart_view(request):
-    sample_id = request.data.get('sample_id')
-    if not sample_id:
-        return Response({"error": "sample_id is required"}, status=400)
 
     matplotlib.use('agg')  # Set the backend to Agg
 
@@ -76,9 +75,16 @@ def radar_chart_view(request):
     # Apply logarithmic scale to radial axis
     ax.set_rscale('log')
 
-    # Zapisz wykres do pliku
-    filename = f'radar_chart.png'
-    plt.savefig(filename, format='png')
-    plt.close()
+#     # Zapisz wykres do pliku
+#     filename = f'radar_chart.png'
+#     plt.savefig(filename, format='png')
+#     plt.close()
 
-    return Response({"message": "Radar chart saved successfully."})
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    plot_data = buffer.getvalue()
+    buffer.close()
+
+    plot = base64.b64encode(plot_data).decode()
+
+    return Response({"plot": plot})
