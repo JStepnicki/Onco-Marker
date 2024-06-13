@@ -9,13 +9,6 @@ from rest_framework.response import Response
 def patient_list(request):
     if request.method == 'GET':
 
-        access_token = request.query_params.get('access_token')
-
-        if access_token:
-            patient = get_object_or_404(Patient, access_token=access_token)
-            serializer = PatientSerializer(patient)
-            return Response(serializer.data)
-
         patients = Patient.objects.all()
         serializer = PatientSerializer(patients, many=True)
         return Response(serializer.data)
