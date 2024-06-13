@@ -13,14 +13,15 @@ function ResultsPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const [patient, setPatient] = useState([]);
+    const [samples, setSamples] = useState([]);
     const [sample, setSample] = useState({});
 
     const organIcons = {
-        pancreas: <PancreasIcon />,
-        liver: <LiverIcon />,
-        breast: <BreastIcon />,
-        prostate: <ProstateIcon />,
-        leukemia: <LeukemiaIcon />,
+        pancreas: <PancreasIcon/>,
+        liver: <LiverIcon/>,
+        breast: <BreastIcon/>,
+        prostate: <ProstateIcon/>,
+        leukemia: <LeukemiaIcon/>,
     };
 
     useEffect(() => {
@@ -30,43 +31,35 @@ function ResultsPage() {
             console.log("No sample data found in location state");
             const urlParts = window.location.pathname.split("/");
             const accessToken = urlParts[urlParts.length - 1];
-            const sampleId = urlParts[urlParts.length - 2];
             const fetchPatient = async () => {
+
                 try {
                     const response = await axios.get(
-                        `${import.meta.env.VITE_API_URL}patients/`,
-                        {
-                            params: {
-                                access_token: accessToken,
-                            },
-                        }
+                        `${import.meta.env.VITE_API_URL}patient/results/${accessToken}/`
                     );
-                    console.log(response.data)
 
                     if (response.data.length === 0) {
                         navigate("/error", {
                             state: {status: 404, message: "Patient not found"},
                         });
                     } else {
-                        setPatient(response.data);
-                        try {
-                            const response = await axios.get(
-                                `${import.meta.env.VITE_API_URL}cancer_samples/`,
-                                {
-                                    params: {
-                                        sample_id: sampleId,
-                                    },
-                                }
-                            );
-                            setSample(response.data);
-                        } catch (error) {
+                        console.log(response.data);
+                        setSamples(response.data);
+
+
+                        const sampleId = parseInt(urlParts[urlParts.length - 2], 10);
+                        console.log(sampleId);
+                        const selectedSample = response.data.find(sample => sample.id === sampleId);
+
+
+                        if (selectedSample) {
+                            setSample(selectedSample);
+                        } else {
                             navigate("/error", {
-                                state: {
-                                    status: error.response?.status || 500,
-                                    message: error.message,
-                                },
+                                state: {status: 404, message: "Sample not found"},
                             });
                         }
+
                     }
                 } catch (error) {
                     navigate("/error", {
@@ -114,23 +107,24 @@ function ResultsPage() {
                         </Card>
                     </Grid>
                     <Grid item xs={12}>
-                        <Card sx={{ marginBottom: '4px', height: '100%' }}>
+                        <Card sx={{marginBottom: '4px', height: '100%'}}>
                             <CardHeader
                                 title={`Organ: ${sample.organ_type}`}
                                 subheader={
                                     <>
                                         <Typography variant="body2">{`Sample ID: ${sample.id}`}</Typography>
-                                        <Typography variant="body2">{`Timestamp: ${new Date(sample.timestamp).toLocaleString()}`}</Typography>
+                                        <Typography
+                                            variant="body2">{`Timestamp: ${new Date(sample.timestamp).toLocaleString()}`}</Typography>
                                     </>
                                 }
                                 action={
-                                    <Box sx={{ position: 'relative', top: 8, right: 8 }}>
+                                    <Box sx={{position: 'relative', top: 8, right: 8}}>
                                         {organIcons[sample.organ_type]}
                                     </Box>
                                 }
-                                sx={{ backgroundColor: '#f5f5f5', padding: '8px' }}
+                                sx={{backgroundColor: '#f5f5f5', padding: '8px'}}
                             />
-                            <CardContent sx={{ padding: '16px' }}>
+                            <CardContent sx={{padding: '16px'}}>
                                 {sample.markers_JSON &&
                                     Object.entries(sample.markers_JSON).map(
                                         ([key, value]) =>
