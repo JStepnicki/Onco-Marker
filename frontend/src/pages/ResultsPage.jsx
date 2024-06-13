@@ -41,6 +41,7 @@ function ResultsPage() {
                             },
                         }
                     );
+                    console.log(response.data)
 
                     if (response.data.length === 0) {
                         navigate("/error", {
