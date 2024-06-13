@@ -8,7 +8,10 @@ from api.views.plot_views import *
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+
 router = DefaultRouter()
+
+
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -50,5 +53,6 @@ urlpatterns = [
     path('cancer_samples/', cancer_sample_list, name='cancer-sample-list'),
     path('cancer_saples_add/', add_cancer_sample, name='add-cancer-sample'), # for adding cancer samples without patient
 
-    path('plot/<int:sample_id>/', radar_chart_view, name='radar-chart')
+    path('plot/<int:sample_id>/', radar_chart_view, name='radar-chart'),
+
 ]

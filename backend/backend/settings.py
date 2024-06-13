@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_rest_passwordreset',
     'django_extensions',
+    'drf_yasg',
     'api',
     'corsheaders',
 ]
