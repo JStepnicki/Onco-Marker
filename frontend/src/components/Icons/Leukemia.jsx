@@ -4,8 +4,8 @@ const Leukemia = (props) => (
 
 
     <svg fill="#000000" height="60px" width="60px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-         xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+         xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xmlSpace="preserve"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+        <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
         <g id="SVGRepo_iconCarrier"> <g> <g> <g> <path
             d="M415.996,351.253C414.823,289.6,378.663,235.2,340.263,177.6c-34.987-52.587-71.147-106.987-80.107-168.427 C259.303,3.947,254.716,0,249.383,0c-5.44,0.107-9.92,4.16-10.453,9.493c-6.613,61.76-40.747,117.44-73.707,171.2 c-36.16,59.093-70.293,114.773-69.227,176.32c1.6,86.08,73.067,154.987,160,154.987c0.96,0,2.027,0,2.987,0 c42.347-0.64,82.667-17.92,112.213-48.213C400.743,433.813,416.849,393.28,415.996,351.253z M355.836,448.853 c-25.6,26.24-60.587,41.28-97.28,41.813c-76.693,1.6-139.733-58.773-141.227-133.973c-1.067-55.36,31.573-108.48,66.027-164.693 c26.027-42.347,52.693-85.867,67.093-133.333c16.213,47.04,44.48,89.493,72,130.88c36.587,54.933,71.147,106.773,72.213,162.133 C395.409,387.947,381.436,422.933,355.836,448.853z"></path>
             <path
