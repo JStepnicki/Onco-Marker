@@ -65,6 +65,7 @@ def radar_chart_view(request, sample_id):
     ax.fill(angles, patient_values, 'b', alpha=0.3)
 
     plt.legend(loc='upper right', bbox_to_anchor=(0.3, 0.3))
+    plt.title(f"Value chart for {organ_type} samples")
     ax.set_rscale('log')
 
     buffer = io.BytesIO()
