@@ -51,7 +51,7 @@ urlpatterns = [
     path('users/', get_all_users, name='get_all_users'),
     path('cancer_sample/<int:pk>/', get_cancer_sample, name='get-cancer-sample'),
     path('cancer_samples/', cancer_sample_list, name='cancer-sample-list'),
-    path('cancer_saples_add/', add_cancer_sample, name='add-cancer-sample'), # for adding cancer samples without patient
+    path('cancer_sample_add/', add_cancer_sample, name='add-cancer-sample'),# for adding cancer samples without patient
 
     path('plot/<int:sample_id>/', radar_chart_view, name='radar-chart'),
 
