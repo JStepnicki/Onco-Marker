@@ -56,13 +56,13 @@ function PatientPage() {
     const [page, setPage] = useState(1);
     const itemsPerPage = 6;
     const [newSampleData, setNewSampleData] = useState({
-        organ_type: "",
-        plasma_CA19_9: "",
-        creatinine: "",
-        LYVE1: "",
-        REG1B: "",
-        TFF1: "",
-        REG1A: "",
+        organ_type: 1,
+        plasma_CA19_9: 1,
+        creatinine: 1,
+        LYVE1: 1,
+        REG1B: 1,
+        TFF1: 1,
+        REG1A: 1,
     });
     const navigate = useNavigate();
     const location = useLocation();
