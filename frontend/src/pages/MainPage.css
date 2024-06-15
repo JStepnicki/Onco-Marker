@@ -1,6 +1,6 @@
 .main-page {
     width: 400px;
-    margin: 5em auto 10em; /* Adjust the top margin here */
+    margin: 2.5em auto 10em;
     margin-right: 10em;
     border-radius: 1.5em;
     padding: 2em;
@@ -8,6 +8,14 @@
     background-color: transparent;
 }
 
+.form-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    text-align: center;
+}
 
 .main-page .MuiTypography-subtitle2 {
     color: #333;
@@ -21,6 +29,12 @@
     color: #6A3D8A;
     cursor: pointer;
     font-weight: bold;
+}
+
+
+.form-container a {
+    margin-top: 10px;
+    display: inline-block;
 }
 
 

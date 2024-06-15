@@ -29,7 +29,7 @@ function Navbar() {
       <StyledAppBar position="static">
         <StyledToolbar>
           <div>
-            <Button color="inherit" component={RouterLink} to="/">Main Page</Button>
+            <Button color="inherit" component={RouterLink} to="/">Login Page</Button>
             <Button color="inherit" component={RouterLink} to="/doctors">Doctor Page</Button>
           </div>
           <div>

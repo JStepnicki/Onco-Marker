@@ -19,13 +19,15 @@ function MainPage() {
 
     return (
         <div className="main-page">
-            {isRegister ? <Register /> : <Login />}
-            <Typography variant="subtitle2">
-                {isRegister ? 'Already have an account? ' : "Don't have an account? "}
-                <Link href="#" onClick={isRegister ? handleLogin : handleRegister} underline="hover">
-                    {isRegister ? 'Log in' : 'Register'}
-                </Link>
-            </Typography>
+            <div className="form-container">
+                {isRegister ? <Register/> : <Login/>}
+                <Typography variant="subtitle2">
+                    {isRegister ? 'Already have an account? ' : "Don't have an account? "}
+                    <Link href="#" onClick={isRegister ? handleLogin : handleRegister} underline="hover">
+                        {isRegister ? 'Log in' : 'Register'}
+                    </Link>
+                </Typography>
+            </div>
         </div>
     );
 }
