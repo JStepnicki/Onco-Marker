@@ -10,75 +10,73 @@ import matplotlib
 
 @api_view(['GET'])
 def radar_chart_view(request, sample_id):
-
-
     matplotlib.use('agg')  # Set the backend to Agg
 
+    # Fetch the specific patient's sample
     sample = get_object_or_404(CancerSample, id=sample_id)
     organ_type = sample.organ_type
     sample_markers = sample.markers_JSON
 
-    # Pobierz wszystkie próbki tego samego typu organu
+    # Fetch all samples of the same organ type
     all_samples = CancerSample.objects.filter(organ_type=organ_type)
 
-    # Przygotuj dane do wykresu radarowego
+    # Prepare data for the radar chart
     categories = list(sample_markers.keys())
-    N = len(categories)
+    num_vars = len(categories)
+
+    # Create radar chart
+    angles = np.linspace(0, 2 * np.pi, num_vars, endpoint=False).tolist()
+    angles += angles[:1]
 
     fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
 
-    # Iteruj tylko po diagnozach 0 i 3
-    for diagnosis in [0, 3]:
-        diagnosis_str = str(diagnosis)
-        diagnosis_samples = all_samples.filter(diagnosis=diagnosis_str)
+    # Function to calculate average marker values for a given diagnosis
+    def calculate_avg_values(diagnosis):
+        diagnosis_samples = all_samples.filter(diagnosis=diagnosis)
+        avg_values = {key: 0 for key in categories}
+        count_valid_samples = 0
 
-        if diagnosis_samples.exists():
-            avg_values = {key: 0 for key in categories}
-            count_valid_samples = 0
+        for ds in diagnosis_samples:
+            for key in ds.markers_JSON:
+                if key in avg_values and isinstance(ds.markers_JSON[key], (int, float)) and not np.isnan(ds.markers_JSON[key]):
+                    avg_values[key] += ds.markers_JSON[key]
+            count_valid_samples += 1  # Increment count for each valid sample
 
-            for ds in diagnosis_samples:
-                for key in ds.markers_JSON:
-                    if key in avg_values and isinstance(ds.markers_JSON[key], (int, float)):
-                        if not np.isnan(ds.markers_JSON[key]):
-                            avg_values[key] += ds.markers_JSON[key]
-                            count_valid_samples += 1
+        if count_valid_samples > 0:
+            avg_values = {k: v / count_valid_samples for k, v in avg_values.items()}
+        else:
+            avg_values = {k: 0 for k in avg_values}
 
-            if count_valid_samples > 0:
-                avg_values = {k: v / count_valid_samples for k, v in avg_values.items()}
-                values = [avg_values[key] if key in avg_values else 0 for key in categories]
-            else:
-                values = [0] * len(categories)
+        return avg_values
 
-            values.append(values[0])  # Zamknij okrąg
-            angles = np.linspace(0, 2 * np.pi, len(categories), endpoint=False).tolist()
-            angles += angles[:1]
+    # Plot average values for diagnoses "1" (healthy) and "3" (diagnosed cancer)
+    colors = ['green', 'red']  # Define colors for healthy and cancer
+    labels = ["healthy", "diagnosed cancer"]
 
-            ax.plot(angles, values, linewidth=1, linestyle='solid', label=f'Diagnosis {diagnosis_str}')
-            ax.fill(angles, values, alpha=0.1)
+    for i, (diagnosis, label) in enumerate([(1, "healthy"), (3, "diagnosed cancer")]):
+        avg_values = calculate_avg_values(diagnosis)
+        values = [avg_values[key] if key in avg_values else 0 for key in categories]
+        values.append(values[0])  # Close the circle
 
-    # Dodaj linie dla wybranej próbki (Sample {sample_id})
-    values = [sample_markers[key] if key in sample_markers and isinstance(sample_markers[key], (int, float)) and not np.isnan(
-        sample_markers[key]) else 0 for key in categories]
-    values.append(values[0])  # Zamknij okrąg
-    angles = np.linspace(0, 2 * np.pi, len(categories), endpoint=False).tolist()
-    angles += angles[:1]
+        ax.plot(angles, values, linewidth=1, linestyle='solid', label=label, color=colors[i])
+        ax.fill(angles, values, alpha=0.1, color=colors[i])
 
-    ax.plot(angles, values, linewidth=2, linestyle='dashed', label=f'Sample {sample_id}', color='black')
-    ax.fill(angles, values, 'b', alpha=0.1)
-
+    # Set up the rest of the chart
     ax.set_yticklabels([])
     ax.set_xticks(angles[:-1])
     ax.set_xticklabels(categories)
 
-    plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
+    # Plot values for the specific patient's sample without checks
+    patient_values = [sample_markers.get(key, 0) for key in categories]
+    patient_values.append(patient_values[0])  # Close the circle
+
+    ax.plot(angles, patient_values, linewidth=2, linestyle='dashed', label='patient sample', color='blue')
+    ax.fill(angles, patient_values, 'b', alpha=0.1)
+
+    plt.legend(loc='upper right', bbox_to_anchor=(0.2, 0.2))
 
     # Apply logarithmic scale to radial axis
     ax.set_rscale('log')
-
-#     # Zapisz wykres do pliku
-#     filename = f'radar_chart.png'
-#     plt.savefig(filename, format='png')
-#     plt.close()
 
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')

@@ -151,39 +151,41 @@ function PatientPage() {
     };
 
     const handleAddSampleClick = async () => {
-        const selectedOrganMarkers = organMarkers[newSampleData.organ_type] || [];
-        const markers = {};
+    const selectedOrganMarkers = organMarkers[newSampleData.organ_type] || [];
+    const markers = {};
 
-        selectedOrganMarkers.forEach(marker => {
-            markers[marker] = newSampleData[marker] || "";
-        });
+    selectedOrganMarkers.forEach(marker => {
+        // Sprawdź, czy wartość jest liczbą (lub floatem)
+        markers[marker] = !isNaN(parseFloat(newSampleData[marker])) ? parseFloat(newSampleData[marker]) : newSampleData[marker];
+    });
 
-        const { organ_type, ...rest } = newSampleData;
+    const { organ_type, ...rest } = newSampleData;
 
-        const dataToSend = {
-            ...rest,
-            markers_JSON: markers,
-            organ_type: organ_type,
-        };
+    const dataToSend = {
+        ...rest,
+        markers_JSON: markers, // Przekazujemy teraz markers jako obiekt z floatami tam, gdzie to konieczne
+        organ_type: organ_type,
+    };
 
-        try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}patients/cancer_samples/add/${patient.id}/`, dataToSend);
+    try {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}patients/cancer_samples/add/${patient.id}/`, dataToSend);
 
-            if (response.status === 201) {
-                const new_sample = response.data;
-                setSamplesData([...samplesData, new_sample]);
-                handleDialogClose();
-            } else {
-                navigate("/error", {
-                    state: { status: error.response.status, message: error.message },
-                });
-            }
-        } catch (error) {
+        if (response.status === 201) {
+            const new_sample = response.data;
+            setSamplesData([...samplesData, new_sample]);
+            handleDialogClose();
+        } else {
             navigate("/error", {
                 state: { status: error.response.status, message: error.message },
             });
         }
-    };
+    } catch (error) {
+        navigate("/error", {
+            state: { status: error.response.status, message: error.message },
+        });
+    }
+};
+
 
     return (
         <StyledBox>
