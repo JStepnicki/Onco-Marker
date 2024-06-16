@@ -2,10 +2,11 @@ import uuid
 
 from api.models import Patient, CancerSample
 from api.serializers import CancerSampleSerializer
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 
 class TestPatientViews(TestCase):
@@ -158,3 +159,19 @@ class TestPatientViews(TestCase):
         expected_data = CancerSampleSerializer(instance=[sample1, sample2], many=True).data
 
         self.assertEqual(data, expected_data)
+
+class GetAllUsersTest(APITestCase):
+            def setUp(self):
+                self.client = APIClient()
+                self.user_url = reverse('get_all_users')
+                self.user1 = get_user_model().objects.create_user(
+                    email='user1@example.com', password='password123', username='User One')
+                self.user2 = get_user_model().objects.create_user(
+                    email='user2@example.com', password='password123', username='User Two')
+
+            def test_get_all_users(self):
+                response = self.client.get(self.user_url)
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(len(response.data), 2)
+                self.assertEqual(response.data[0]['email'], 'user1@example.com')
+                self.assertEqual(response.data[1]['email'], 'user2@example.com')
