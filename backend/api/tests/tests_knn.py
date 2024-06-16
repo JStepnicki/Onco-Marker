@@ -113,3 +113,10 @@ class TestClassifySample(TestCase):
         y_pred, stage_pred = classify_sample(self.sample3.id, "test")
         self.assertEqual(y_pred, "3")
         self.assertEqual(stage_pred, "IIIB")
+
+    @patch('api.models.CancerSample.objects.get')
+    def test_classify_sample_diagnosis_2(self, mock_get):
+        mock_get.return_value = self.sample2
+        y_pred, stage_pred = classify_sample(self.sample2.id, "test")
+        self.assertEqual(y_pred, "1")
+        self.assertIsNone(stage_pred)
