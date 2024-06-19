@@ -92,9 +92,10 @@ function EditDialog({open, handleClose, patient, updatePatient}) {
 
     return (
         <ThemeProvider theme={theme}>
-            <StyledDialog open={open} onClose={handleClose}>
+            <StyledDialog open={open} onClose={handleClose} id={'edit-dialog'}>
                 <DialogContent>
                     <TextField
+                        id={'name'}
                         name="name"
                         label="Name"
                         value={editForm?.name}
@@ -102,6 +103,7 @@ function EditDialog({open, handleClose, patient, updatePatient}) {
                         fullWidth
                     />
                     <TextField
+                        id={'surname'}
                         name="surname"
                         label="Surname"
                         value={editForm?.surname}
@@ -109,6 +111,7 @@ function EditDialog({open, handleClose, patient, updatePatient}) {
                         fullWidth
                     />
                     <TextField
+                        id={'email'}
                         name="email"
                         label="Email"
                         value={editForm?.email}
@@ -116,6 +119,7 @@ function EditDialog({open, handleClose, patient, updatePatient}) {
                         fullWidth
                     />
                     <TextField
+                        id={'age'}
                         name="age"
                         label="Age"
                         type="number"
@@ -126,6 +130,7 @@ function EditDialog({open, handleClose, patient, updatePatient}) {
                     <FormControl fullWidth>
                         <InputLabel id="sex-label">Sex</InputLabel>
                         <Select
+                            id={'sex'}
                             labelId="sex-label"
                             name="sex"
                             value={editForm?.sex}
@@ -139,6 +144,7 @@ function EditDialog({open, handleClose, patient, updatePatient}) {
                 <DialogActions>
                     <Button
                         onClick={handleClose}
+                        id={'cancel-button'}
                         sx={{
                             backgroundColor: '#333',
                             color: '#fff',
@@ -152,6 +158,7 @@ function EditDialog({open, handleClose, patient, updatePatient}) {
                     </Button>
                     <Button
                         onClick={handleUpdate}
+                        id={'update-button'}
                         sx={{
                             backgroundColor: '#333',
                             color: '#fff',

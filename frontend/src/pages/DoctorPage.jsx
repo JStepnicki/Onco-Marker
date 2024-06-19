@@ -11,7 +11,7 @@ function DoctorPage() {
     }
   return (
     <div className="doctor-page">
-      <PatientList />
+      <PatientList/>
     </div>
   );
 }

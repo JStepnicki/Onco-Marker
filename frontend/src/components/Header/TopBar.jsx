@@ -110,7 +110,7 @@ function TopBar({patient, handleDialogOpen, page, setPage, totalItems}) {
                                 backgroundColor: '#555',
                                 cursor: 'pointer'
                             }
-                        }}>
+                        }} id={'add-new-sample'}>
                             Add New Sample
                         </Button>
                     </StyledBox>

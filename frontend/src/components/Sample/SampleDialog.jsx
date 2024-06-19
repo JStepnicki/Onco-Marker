@@ -73,13 +73,14 @@ function SampleDialog({ open, handleClose, newSampleData, handleInputChange, han
                     <FormControl fullWidth margin="dense">
                         <InputLabel>Organ Type</InputLabel>
                         <Select
+                            id={'organ-type'}
                             value={newSampleData.organ_type}
                             onChange={handleOrganChange}
                             name="organ_type"
                             sx={{ minWidth: 500 }}
                         >
                             {Object.keys(organMarkers).map((organ) => (
-                                <MenuItem key={organ} value={organ}>
+                                <MenuItem key={organ} value={organ} id={organ}>
                                     {organ}
                                 </MenuItem>
                             ))}
@@ -87,6 +88,7 @@ function SampleDialog({ open, handleClose, newSampleData, handleInputChange, han
                     </FormControl>
                     {selectedOrgan && organMarkers[selectedOrgan].map((marker) => (
                         <TextField
+                            id={marker}
                             key={marker}
                             margin="dense"
                             name={marker}
@@ -100,6 +102,7 @@ function SampleDialog({ open, handleClose, newSampleData, handleInputChange, han
                 </DialogContent>
                 <DialogActions>
                     <Button
+                        id={'cancel-sample-button'}
                         onClick={handleClose}
                         sx={{
                             backgroundColor: '#333',
@@ -113,6 +116,7 @@ function SampleDialog({ open, handleClose, newSampleData, handleInputChange, han
                         Cancel
                     </Button>
                     <Button
+                        id={'add-sample-button'}
                         onClick={handleAddSampleClick}
                         type="submit"
                         sx={{

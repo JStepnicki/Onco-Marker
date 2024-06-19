@@ -111,6 +111,7 @@ function Register() {
                     <TextField
                         label="Username"
                         variant="outlined"
+                        id={'username'}
                         fullWidth
                         margin="normal"
                         value={username}
@@ -121,6 +122,7 @@ function Register() {
                         label="Email"
                         variant="outlined"
                         fullWidth
+                        id={'email'}
                         margin="normal"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -129,8 +131,9 @@ function Register() {
                     <TextField
                         label="Password"
                         variant="outlined"
-                        type="password"
+                        type="password1"
                         fullWidth
+                        id={'password1'}
                         margin="normal"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -140,6 +143,7 @@ function Register() {
                         label="Confirm Password"
                         variant="outlined"
                         type="password"
+                        id={'password2'}
                         fullWidth
                         margin="normal"
                         value={confirmPassword}

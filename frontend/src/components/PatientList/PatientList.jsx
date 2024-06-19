@@ -170,7 +170,7 @@ function PatientList() {
                 totalItems={patients.length}
                 addPatient={addPatient}
             />
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} id={'patient-list'} >
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -189,9 +189,9 @@ function PatientList() {
                                 <StyledTableCell align="center">{patient.email}</StyledTableCell>
                                 <StyledTableCell align="center">{patient.age}</StyledTableCell>
                                 <StyledTableCell align="center">
-                                    <ProfileIcon style={{ marginRight: '10px' }} onClick={() => handleExamineSamples(patient.id)}/>
-                                    <EditIcon style={{ marginRight: '10px' }} onClick={() => handleOpen(patient)}/>
-                                    <DeleteIcon onClick={() => deletePatient(patient.id)}/>
+                                    <ProfileIcon id={`profile-icon-${patient.id}`} style={{ marginRight: '10px' }} onClick={() => handleExamineSamples(patient.id)}/>
+                                    <EditIcon id={`edit-icon-${patient.id}`} style={{ marginRight: '10px' }} onClick={() => handleOpen(patient)}/>
+                                    <DeleteIcon id={`delete-icon-${patient.id}`} onClick={() => deletePatient(patient.id)}/>
                                 </StyledTableCell>
                             </TableRow>
                         ))}
@@ -203,6 +203,7 @@ function PatientList() {
                 handleClose={handleClose}
                 patient={editPatient}
                 updatePatient={updatePatient}
+                id={`edit-dialog`}
             />
         </StyledBox>
     );

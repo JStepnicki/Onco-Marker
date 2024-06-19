@@ -2,8 +2,8 @@
 import React from 'react';
 import StyledIcon from './StyledIcon';
 
-const BloodSampleIcon = ({ onClick }) => (
-    <StyledIcon onClick={onClick} width="30px" height="30px" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+const BloodSampleIcon = ({onClick, id}) => (
+    <StyledIcon id={id} onClick={onClick} width="30px" height="30px" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill="#000000" d="M332.536,52.784V0H179.464v52.784h-36.948v79.175h36.948v351.01c0,16.008,13.023,29.031,29.031,29.031h95.01
         c16.007,0,29.031-13.023,29.031-29.031v-351.01h36.948V52.784H332.536z M195.299,15.835h52.784v23.753h15.835V15.835h52.784
         v36.948H195.299V15.835z M316.701,482.969c0,7.277-5.919,13.196-13.196,13.196h-95.01c-7.277,0-13.196-5.919-13.196-13.196

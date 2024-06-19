@@ -110,6 +110,7 @@ function Login() {
                 <TextField
                     label="Email"
                     variant="outlined"
+                    id={'email'}
                     fullWidth
                     margin="normal"
                     value={email}
@@ -122,6 +123,7 @@ function Login() {
                     type="password"
                     fullWidth
                     margin="normal"
+                    id={'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     inputProps={{ style: { fontSize: 20 } }}

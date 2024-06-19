@@ -197,13 +197,14 @@ function PatientPage() {
                 totalItems={samplesData.length}
             />
             <SampleDialog
+                id="sample-dialog"
                 open={dialogOpen}
                 handleClose={handleDialogClose}
                 newSampleData={newSampleData}
                 handleInputChange={handleInputChange}
                 handleAddSampleClick={handleAddSampleClick}
             />
-            <Grid container spacing={1} sx={{ justifyContent: 'center' }}>
+            <Grid container spacing={1} sx={{ justifyContent: 'center' }} id={'samples'}>
                 {samplesData
                     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
                     .slice((page - 1) * itemsPerPage, page * itemsPerPage)
@@ -241,7 +242,7 @@ function PatientPage() {
                                     </Typography>
                                 </CardContent>
                                 <CardActions sx={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px' }}>
-                                    <BloodSampleIcon onClick={() => handleKnnClick(sample)} />
+                                    <BloodSampleIcon id={`blood-icon-${sample.id}`} onClick={() => handleKnnClick(sample)} />
                                     <DeleteIcon onClick={() => handleDeleteClick(sample.id)} />
                                 </CardActions>
                             </Card>
