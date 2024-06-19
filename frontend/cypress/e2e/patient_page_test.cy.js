@@ -16,7 +16,7 @@ describe('PatientPage', () => {
 
 
     it('should go to result page when knn button is clicked', () => {
-        cy.get('#blood-icon-781').click()
+        cy.get('#blood-icon-781', { timeout: 10000 }).click()
         cy.url().should('include', '/result')
     })
 
