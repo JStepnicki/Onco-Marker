@@ -264,3 +264,12 @@ class TestSample(TestCase):
 
         expected_data = CancerSampleSerializer(instance=[sample1, sample2], many=True).data
         self.assertEqual(data, expected_data)
+
+    def test_set_markers(self):
+        patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1,  email='john.doe@example.com')
+        sample1 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+                                              diagnosis="", organ_type="")
+
+        markers = {'marker1': 'value1'}
+        sample1.set_markers(markers)
+        self.assertEqual(sample1.markers_JSON, markers)
