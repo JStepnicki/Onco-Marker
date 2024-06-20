@@ -143,9 +143,9 @@ class TestPatientViews(TestCase):
             sex=1
         )
 
-        sample1 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+        sample1 = CancerSample.objects.create(patient=patient, stage="", markers_JSON={},
                                               diagnosis="", organ_type="")
-        sample2 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+        sample2 = CancerSample.objects.create(patient=patient, stage="", markers_JSON={},
                                               diagnosis="", organ_type="")
 
         url = reverse('patient_results', kwargs={'access_token': access_token})

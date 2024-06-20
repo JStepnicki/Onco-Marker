@@ -24,7 +24,6 @@ class TestSample(TestCase):
         data = {
             "organ_type": "pancreas",
             "stage": "",
-            "benign_sample_diagnosis": "",
             "markers_JSON": {
                 "plasma_CA19_9": 11.7,
                 "creatinine": 1.83222,
@@ -48,7 +47,6 @@ class TestSample(TestCase):
 
         self.assertEqual(cancer_sample.organ_type, "pancreas")
         self.assertEqual(cancer_sample.stage, "")
-        self.assertEqual(cancer_sample.benign_sample_diagnosis, "")
         self.assertEqual(cancer_sample.diagnosis, "")
         self.assertEqual(cancer_sample.markers_JSON["plasma_CA19_9"], 11.7)
         self.assertEqual(cancer_sample.markers_JSON["creatinine"], 1.83222)
@@ -63,7 +61,6 @@ class TestSample(TestCase):
         data = {
             "organ_type": "pancreas",
             "stage": "",
-            "benign_sample_diagnosis": "",
             "markers_JSON": {
                 "plasma_CA19_9": 11.7,
                 "creatinine": 1.83222,
@@ -86,7 +83,7 @@ class TestSample(TestCase):
     def test_delete_cancer_sample(self):
         patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
         sample = CancerSample.objects.create(patient=patient, organ_type="pancreas", stage="",
-                                             benign_sample_diagnosis="", markers_JSON={}, diagnosis="")
+                                              markers_JSON={}, diagnosis="")
 
         delete_cancer_sample_url = reverse('delete-cancer-sample', kwargs={'pk': sample.pk})
 
@@ -108,13 +105,12 @@ class TestSample(TestCase):
     def test_update_cancer_sample(self):
         patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
         sample = CancerSample.objects.create(patient=patient, organ_type="pancreas", stage="",
-                                             benign_sample_diagnosis="", markers_JSON={}, diagnosis="")
+                                              markers_JSON={}, diagnosis="")
 
         updated_data = {
             "patient": patient.pk,
             "organ_type": "liver",
             "stage": "II",
-            "benign_sample_diagnosis": "None",
             "markers_JSON": {
                 "plasma_CA19_9": 20.5,
                 "creatinine": 1.2,
@@ -137,7 +133,6 @@ class TestSample(TestCase):
 
         self.assertEqual(sample.organ_type, "liver")
         self.assertEqual(sample.stage, "II")
-        self.assertEqual(sample.benign_sample_diagnosis, "None")
         self.assertEqual(sample.markers_JSON, {
             "plasma_CA19_9": 20.5,
             "creatinine": 1.2,
@@ -154,7 +149,6 @@ class TestSample(TestCase):
         updated_data = {
             "organ_type": "liver",
             "stage": "II",
-            "benign_sample_diagnosis": "None",
             "markers_JSON": {
                 "plasma_CA19_9": 20.5,
                 "creatinine": 1.2,
@@ -175,9 +169,9 @@ class TestSample(TestCase):
 
     def test_get_cancer_samples_list(self):
         patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
-        sample1 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+        sample1 = CancerSample.objects.create(patient=patient, stage="", markers_JSON={},
                                               diagnosis="", organ_type="")
-        sample2 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+        sample2 = CancerSample.objects.create(patient=patient, stage="", markers_JSON={},
                                               diagnosis="", organ_type="")
 
         url = reverse('cancer-sample-list')
@@ -194,7 +188,6 @@ class TestSample(TestCase):
     def test_add_and_get_single_cancer_sample(self):
         sample_data = {
             'stage': "Stage I",
-            'benign_sample_diagnosis': "Diagnosis A",
             'markers_JSON': {'marker1': 'value1'},
             'diagnosis': "Diagnosis X",
             'organ_type': "Liver"
@@ -225,9 +218,9 @@ class TestSample(TestCase):
 
     def test_get_patient_cancer_samples(self):
         patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
-        sample1 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+        sample1 = CancerSample.objects.create(patient=patient, stage="", markers_JSON={},
                                               diagnosis="", organ_type="")
-        sample2 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+        sample2 = CancerSample.objects.create(patient=patient, stage="", markers_JSON={},
                                               diagnosis="", organ_type="")
 
         url = reverse('get-patient-cancer-samples', kwargs={'pk': patient.pk})
@@ -251,8 +244,8 @@ class TestSample(TestCase):
     def test_get_all_cancer_samples(self):
         patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1, email='john.doe@example.com')
 
-        sample1 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={}, diagnosis="", organ_type="")
-        sample2 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={}, diagnosis="", organ_type="")
+        sample1 = CancerSample.objects.create(patient=patient, stage="", markers_JSON={}, diagnosis="", organ_type="")
+        sample2 = CancerSample.objects.create(patient=patient, stage="", markers_JSON={}, diagnosis="", organ_type="")
 
         url = reverse('cancer-sample-list')
 
@@ -267,7 +260,7 @@ class TestSample(TestCase):
 
     def test_set_markers(self):
         patient = Patient.objects.create(name='John', surname='Doe', age=33, sex=1,  email='john.doe@example.com')
-        sample1 = CancerSample.objects.create(patient=patient, stage="", benign_sample_diagnosis="", markers_JSON={},
+        sample1 = CancerSample.objects.create(patient=patient, stage="", markers_JSON={},
                                               diagnosis="", organ_type="")
 
         markers = {'marker1': 'value1'}

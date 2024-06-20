@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from api.models import CancerSample
 import matplotlib
 
+
 @api_view(['GET'])
 def radar_chart_view(request, sample_id):
     matplotlib.use('agg')
@@ -33,7 +34,8 @@ def radar_chart_view(request, sample_id):
 
         for ds in diagnosis_samples:
             for key in ds.markers_JSON:
-                if key in avg_values and isinstance(ds.markers_JSON[key], (int, float)) and not np.isnan(ds.markers_JSON[key]):
+                if key in avg_values and isinstance(ds.markers_JSON[key], (int, float)) and not np.isnan(
+                        ds.markers_JSON[key]):
                     avg_values[key] += ds.markers_JSON[key]
             count_valid_samples += 1
 

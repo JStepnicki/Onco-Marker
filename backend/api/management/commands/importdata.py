@@ -24,7 +24,6 @@ class Command(BaseCommand):
                 CancerSample.objects.create(
                     patient = None,
                     stage=row['stage'] if row['stage'] else None,
-                    benign_sample_diagnosis=row['benign_sample_diagnosis'] if row['benign_sample_diagnosis'] else None,
                     markers_JSON=markers,
                     diagnosis=row['diagnosis'],
                 )

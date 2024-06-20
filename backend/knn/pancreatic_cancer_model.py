@@ -16,7 +16,7 @@ def classify_sample(sample_id, organ_type):
         sample_df = pd.DataFrame(list(queryset.values()))
         markers_df = pd.json_normalize(sample_df['markers_JSON'])
 
-        sample_df.drop(columns=["id", "timestamp", "organ_type", 'patient_id', 'benign_sample_diagnosis', 'markers_JSON', 'stage'], inplace=True)
+        sample_df.drop(columns=["id", "timestamp", "organ_type", 'patient_id', 'markers_JSON', 'stage'], inplace=True)
         sample_df = pd.concat([sample_df, markers_df], axis=1)
         sample_df.fillna(0, inplace=True)
         scaler = StandardScaler()
@@ -42,7 +42,7 @@ def classify_sample(sample_id, organ_type):
 
             sample_df_second = pd.DataFrame(list(queryset_second.values()))
             markers_df_second = pd.json_normalize(sample_df_second['markers_JSON'])
-            sample_df_second.drop(columns=["id", "timestamp", "organ_type", 'patient_id', 'benign_sample_diagnosis', 'markers_JSON', 'diagnosis'],
+            sample_df_second.drop(columns=["id", "timestamp", "organ_type", 'patient_id', 'markers_JSON', 'diagnosis'],
                                   inplace=True)
             sample_df_second = pd.concat([sample_df_second, markers_df_second], axis=1)
             sample_df_second.fillna(0, inplace=True)

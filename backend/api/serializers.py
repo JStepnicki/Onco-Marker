@@ -20,7 +20,7 @@ class PatientSerializer(ModelSerializer):
 class CancerSampleSerializer(ModelSerializer):
     class Meta:
         model = CancerSample
-        fields = ('id', 'patient', 'stage', 'benign_sample_diagnosis' ,'markers_JSON', 'timestamp', 'diagnosis', 'organ_type')
+        fields = ('id', 'patient', 'stage' ,'markers_JSON', 'timestamp', 'diagnosis', 'organ_type')
 
 class UserRegisterSerializer(ModelSerializer):
     class Meta:
